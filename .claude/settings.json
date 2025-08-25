@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Write(*)",
+      "Read(*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(go build:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm config set:*)",
+      "Bash(source:*)",
+      "Bash(ls:*)",
+      "Bash(go test:*)",
+      "Bash(go list:*)",
+      "WebFetch(domain:bytedance.sg.larkoffice.com)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ./.claude/sound-notify.sh user_input_required"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ./.claude/sound-notify.sh task_completed"
+          }
+        ]
+      }
+    ]
+  }
+}

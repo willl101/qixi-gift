@@ -1,0 +1,1076 @@
+/* iOS风格蓝色渐变主题 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    /* iOS系统色彩 */
+    --ios-blue: #007AFF;
+    --ios-purple: #5856D6;
+    --ios-teal: #32ADE6;
+    --ios-indigo: #5E5CE6;
+    
+    /* 渐变色 */
+    --gradient-primary: linear-gradient(135deg, #007AFF, #5856D6);
+    --gradient-secondary: linear-gradient(135deg, #32ADE6, #007AFF);
+    --gradient-aurora: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-ocean: linear-gradient(135deg, #667eea 0%, #32ADE6 100%);
+    
+    /* 基础色 */
+    --bg-primary: #F2F2F7;
+    --bg-secondary: #FFFFFF;
+    --text-primary: #1C1C1E;
+    --text-secondary: #8E8E93;
+    --text-tertiary: #C7C7CC;
+    --border-color: rgba(60, 60, 67, 0.12);
+    
+    /* 玻璃效果 */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --shadow-soft: 0 10px 40px rgba(0, 122, 255, 0.1);
+    --shadow-medium: 0 20px 60px rgba(0, 122, 255, 0.15);
+    
+    /* 动画 */
+    --ease-ios: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-spring: cubic-bezier(0.5, 1.6, 0.4, 0.7);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 密码验证界面 */
+.auth-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-ocean);
+    opacity: 0.9;
+    animation: gradientShift 10s ease infinite;
+}
+
+.auth-modal {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-medium);
+    min-width: 320px;
+    animation: modalFloat 6s ease-in-out infinite;
+}
+
+.auth-icon {
+    margin-bottom: 20px;
+}
+
+.heart-pulse {
+    font-size: 60px;
+    animation: heartPulse 1.5s ease infinite;
+}
+
+.auth-modal h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-modal p {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+.passcode-dots {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--ios-blue);
+    border-radius: 50%;
+    transition: all 0.3s var(--ease-ios);
+}
+
+.dot.filled {
+    background: var(--ios-blue);
+    transform: scale(1.2);
+}
+
+#passcodeInput {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.auth-hint {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    margin-top: 20px;
+}
+
+/* 初始设置界面 */
+.setup-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.setup-gradient {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-aurora);
+    opacity: 0.1;
+}
+
+.setup-content {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: var(--shadow-medium);
+    max-width: 400px;
+    width: 90%;
+}
+
+.setup-content h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 30px;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.name-inputs {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.name-inputs input {
+    flex: 1;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    font-size: 16px;
+    text-align: center;
+    transition: all 0.3s var(--ease-ios);
+}
+
+.name-inputs input:focus {
+    outline: none;
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.heart-link {
+    font-size: 24px;
+    animation: heartBeat 2s infinite;
+}
+
+.date-section {
+    margin-bottom: 30px;
+}
+
+.date-section label {
+    display: block;
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.date-section input {
+    width: 100%;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.glass-button {
+    position: relative;
+    width: 100%;
+    padding: 18px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s var(--ease-ios);
+}
+
+.glass-button:active {
+    transform: scale(0.98);
+}
+
+.button-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.glass-button:hover .button-glow {
+    opacity: 1;
+}
+
+/* 主界面 */
+.main-flow {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 动态背景 */
+.flow-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.gradient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    animation: orbFloat 20s infinite;
+}
+
+.orb-1 {
+    width: 600px;
+    height: 600px;
+    background: var(--gradient-primary);
+    top: -200px;
+    left: -200px;
+    animation-duration: 25s;
+}
+
+.orb-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--gradient-secondary);
+    bottom: -100px;
+    right: -100px;
+    animation-duration: 20s;
+    animation-delay: -5s;
+}
+
+.orb-3 {
+    width: 500px;
+    height: 500px;
+    background: var(--gradient-aurora);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-duration: 30s;
+    animation-delay: -10s;
+}
+
+/* 信息栏 */
+.info-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    padding-top: calc(20px + env(safe-area-inset-top));
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.couple-info {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.heart-icon {
+    animation: heartBeat 2s infinite;
+}
+
+.days-info {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.days-number {
+    font-size: 24px;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.days-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* 时光流容器 */
+.time-flow {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding-left: 50px;
+    padding-right: 50px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 流动卡片 */
+.flow-card {
+    flex-shrink: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.5s var(--ease-ios);
+    animation: cardFloat 6s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.flow-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+    opacity: 0;
+}
+
+.flow-card:hover::before {
+    animation: shimmer 0.5s;
+    opacity: 1;
+}
+
+.flow-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: var(--shadow-medium);
+}
+
+/* 卡片变体 */
+.card-start {
+    min-width: 300px;
+    text-align: center;
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.card-start h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.start-date {
+    font-size: 20px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.quote {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.card-home {
+    min-width: 350px;
+}
+
+.card-mood {
+    min-width: 320px;
+}
+
+.card-countdown {
+    min-width: 280px;
+}
+
+.card-quote {
+    min-width: 300px;
+    background: var(--gradient-ocean);
+    color: white;
+}
+
+/* 卡片头部 */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.card-icon {
+    font-size: 24px;
+}
+
+.card-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* 小窝图片 */
+.home-image-container {
+    width: 100%;
+    height: 200px;
+    background: var(--bg-primary);
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+}
+
+.image-placeholder {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+}
+
+.upload-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.home-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 心情选择器 */
+.mood-selector {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+
+.mood-emoji {
+    width: 45px;
+    height: 45px;
+    border: 2px solid transparent;
+    background: var(--bg-primary);
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-ios);
+}
+
+.mood-emoji:hover,
+.mood-emoji.active {
+    border-color: var(--ios-blue);
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
+}
+
+#moodText {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    resize: none;
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.mini-button {
+    padding: 8px 20px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.recent-moods {
+    margin-top: 15px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.mood-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* 倒计时 */
+.countdown-display {
+    text-align: center;
+}
+
+.countdown-ring {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+}
+
+.countdown-ring svg {
+    transform: rotate(-90deg);
+}
+
+.ring-bg {
+    fill: none;
+    stroke: var(--bg-primary);
+    stroke-width: 8;
+}
+
+.ring-progress {
+    fill: none;
+    stroke: url(#gradient);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 339.292;
+    stroke-dashoffset: 339.292;
+    transition: stroke-dashoffset 1s var(--ease-ios);
+}
+
+.countdown-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.countdown-num {
+    display: block;
+    font-size: 36px;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.countdown-unit {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.glass-input {
+    width: 100%;
+    padding: 12px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* 每日一句 */
+.quote-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.quote-mark {
+    font-size: 40px;
+    opacity: 0.3;
+    display: block;
+}
+
+.quote-mark:last-child {
+    margin-top: -10px;
+}
+
+.quote-content p {
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 20px 0;
+}
+
+/* 照片记忆区 */
+.memory-section {
+    min-width: 100vw;
+    padding: 0 50px;
+}
+
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.photo-river {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    overflow-x: auto;
+    align-items: center;
+}
+
+.photo-float {
+    flex-shrink: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s var(--ease-ios);
+    cursor: pointer;
+    animation: photoFloat 8s ease-in-out infinite;
+}
+
+.photo-float:nth-child(odd) {
+    animation-delay: -2s;
+    transform: translateY(-20px);
+}
+
+.photo-float:nth-child(even) {
+    animation-delay: -4s;
+    transform: translateY(20px);
+}
+
+.photo-float:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--shadow-medium);
+}
+
+.add-photo {
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.add-icon {
+    font-size: 40px;
+    font-weight: 300;
+}
+
+.photo-float img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 纽带延伸 */
+.ribbon-extend {
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.ribbon-line {
+    width: 200px;
+    height: 2px;
+    background: var(--gradient-primary);
+    animation: ribbonPulse 3s ease-in-out infinite;
+}
+
+.ribbon-text {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* 浮动操作按钮 */
+.float-actions {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 90;
+}
+
+.action-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-ios);
+}
+
+.action-button:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-medium);
+}
+
+.button-emoji {
+    font-size: 24px;
+}
+
+.button-text {
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.hug-button {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+/* 滚动提示 */
+.scroll-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    animation: fadeInOut 3s ease-in-out infinite;
+}
+
+.scroll-arrow {
+    animation: arrowMove 1.5s ease-in-out infinite;
+}
+
+/* 拥抱动画 */
+.hug-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hug-wave {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    opacity: 0.3;
+    animation: waveExpand 2s ease-out;
+}
+
+.hug-hearts {
+    position: relative;
+    height: 200px;
+}
+
+.floating-heart {
+    position: absolute;
+    font-size: 40px;
+    animation: floatHeart 3s ease-out forwards;
+    animation-delay: var(--delay);
+}
+
+.hug-text {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 30px;
+    animation: fadeIn 1s ease-out;
+}
+
+/* 图片查看器 */
+.image-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.viewer-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+}
+
+.viewer-image {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.viewer-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    font-size: 30px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.viewer-close:hover {
+    transform: rotate(90deg);
+}
+
+/* 动画定义 */
+@keyframes gradientShift {
+    0%, 100% { opacity: 0.9; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes modalFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.1); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.15); }
+}
+
+@keyframes orbFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(30px, -30px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+}
+
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(0.5deg); }
+    75% { transform: translateY(5px) rotate(-0.5deg); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes photoFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(2deg); }
+    75% { transform: translateY(10px) rotate(-2deg); }
+}
+
+@keyframes ribbonPulse {
+    0%, 100% { width: 200px; opacity: 0.5; }
+    50% { width: 250px; opacity: 1; }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+@keyframes arrowMove {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+@keyframes waveExpand {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(5);
+        opacity: 0;
+    }
+}
+
+@keyframes floatHeart {
+    0% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(-20px) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-150px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .time-flow {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .flow-card {
+        min-width: 280px !important;
+    }
+    
+    .float-actions {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 122, 255, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 122, 255, 0.5);
+}
+
+/* iOS安全区域 */
+@supports (padding: env(safe-area-inset-top)) {
+    .info-bar {
+        padding-top: calc(20px + env(safe-area-inset-top));
+    }
+    
+    .main-flow {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}

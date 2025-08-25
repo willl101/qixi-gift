@@ -1,0 +1,1311 @@
+/* 无缝纽带式设计 - iOS玻璃质感 + 阳光渐变 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    /* 阳光渐变色系 */
+    --sun-gold: #FFD700;
+    --sun-orange: #FFA500;
+    --sun-pink: #FFB6C1;
+    
+    /* 天空渐变色系 */
+    --sky-blue: #87CEEB;
+    --ocean-blue: #4A90E2;
+    --deep-blue: #2563EB;
+    --purple-blue: #6366F1;
+    
+    /* 玻璃效果 */
+    --glass-white: rgba(255, 255, 255, 0.1);
+    --glass-blur: 20px;
+    --glass-border: rgba(255, 255, 255, 0.2);
+    
+    /* 光晕效果 */
+    --glow-soft: 0 0 40px rgba(135, 206, 235, 0.3);
+    --glow-medium: 0 0 80px rgba(135, 206, 235, 0.4);
+    --glow-strong: 0 0 120px rgba(255, 215, 0, 0.3);
+    
+    /* 动画曲线 */
+    --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    overflow-x: hidden;
+    height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(135, 206, 235, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 182, 193, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 认证层 - 极光效果 */
+.auth-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.aurora-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.aurora-gradient {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        #667eea,
+        #764ba2,
+        #f093fb,
+        #f5576c,
+        #4facfe,
+        #00f2fe
+    );
+    animation: auroraFlow 20s ease infinite;
+    opacity: 0.8;
+}
+
+.aurora-light {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 255, 255, 0.2) 0%,
+        transparent 70%
+    );
+    animation: auroraRotate 30s linear infinite;
+}
+
+@keyframes auroraFlow {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-10%, 10%) rotate(90deg); }
+    50% { transform: translate(10%, -10%) rotate(180deg); }
+    75% { transform: translate(-5%, -5%) rotate(270deg); }
+}
+
+@keyframes auroraRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 玻璃面板 */
+.glass-panel {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 60px 50px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        inset 0 0 60px rgba(255, 255, 255, 0.1);
+    animation: floatPanel 6s ease-in-out infinite;
+}
+
+@keyframes floatPanel {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.02); }
+}
+
+.auth-content {
+    text-align: center;
+}
+
+.logo-heart {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: heartGlow 2s ease infinite;
+}
+
+@keyframes heartGlow {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 20px rgba(100, 150, 250, 0.8));
+    }
+    50% { 
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 40px rgba(100, 150, 250, 1));
+    }
+}
+
+.gradient-text {
+    font-size: 36px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #00f2fe, #f093fb);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+    margin-bottom: 30px;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.passcode-field {
+    position: relative;
+    margin-top: 30px;
+}
+
+.passcode-field input {
+    width: 200px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    letter-spacing: 10px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s var(--ease-smooth);
+}
+
+.passcode-field input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: var(--glow-medium);
+}
+
+.passcode-glow {
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, #667eea, #00f2fe);
+    border-radius: 15px;
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.passcode-field input:focus ~ .passcode-glow {
+    opacity: 0.5;
+}
+
+/* 主内容 - 无缝纽带 */
+.main-ribbon {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 动态光晕背景 */
+.ambient-light {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.light-beam {
+    position: absolute;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(255, 215, 0, 0.1),
+        transparent
+    );
+    filter: blur(40px);
+    animation: beamFloat 20s ease-in-out infinite;
+}
+
+.beam-1 {
+    width: 300px;
+    height: 100%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.beam-2 {
+    width: 400px;
+    height: 100%;
+    left: 50%;
+    animation-delay: -7s;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(135, 206, 235, 0.1),
+        transparent
+    );
+}
+
+.beam-3 {
+    width: 350px;
+    height: 100%;
+    right: 10%;
+    animation-delay: -14s;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(255, 182, 193, 0.1),
+        transparent
+    );
+}
+
+@keyframes beamFloat {
+    0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.5; }
+    25% { transform: translateX(50px) scaleY(1.2); opacity: 0.8; }
+    50% { transform: translateX(-30px) scaleY(0.9); opacity: 0.6; }
+    75% { transform: translateX(20px) scaleY(1.1); opacity: 0.7; }
+}
+
+.sun-glow {
+    position: absolute;
+    top: 20%;
+    right: 15%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(
+        circle,
+        rgba(255, 215, 0, 0.3) 0%,
+        rgba(255, 165, 0, 0.2) 30%,
+        transparent 70%
+    );
+    filter: blur(60px);
+    animation: sunPulse 10s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.3); opacity: 0.8; }
+}
+
+/* 浮动信息条 */
+.info-glass {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 15px 30px;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    z-index: 100;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.05);
+}
+
+.couple-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.pulse-heart {
+    animation: heartPulse 1.5s ease infinite;
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.days-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.days-badge #daysCount {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.days-text {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* 无缝纽带容器 */
+.ribbon-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 纽带光晕 */
+.ribbon-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 500%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.glow-path {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(135, 206, 235, 0.6),
+        rgba(255, 215, 0, 0.6),
+        rgba(255, 182, 193, 0.6),
+        rgba(135, 206, 235, 0.6),
+        transparent
+    );
+    filter: blur(10px);
+    transform: translateY(-50%);
+    animation: glowFlow 20s linear infinite;
+}
+
+.glow-path::before,
+.glow-path::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: inherit;
+    filter: blur(30px);
+    opacity: 0.3;
+}
+
+@keyframes glowFlow {
+    from { transform: translateY(-50%) translateX(0); }
+    to { transform: translateY(-50%) translateX(-20%); }
+}
+
+/* 流动内容 */
+.flow-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+    min-height: 100vh;
+    z-index: 2;
+}
+
+/* 纽带段落 */
+.ribbon-segment {
+    flex-shrink: 0;
+    padding: 0 30px;
+    position: relative;
+}
+
+/* 玻璃卡片 */
+.glass-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        inset 0 0 40px rgba(255, 255, 255, 0.05);
+    transition: all 0.5s var(--ease-smooth);
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.5s;
+    opacity: 0;
+}
+
+.glass-card:hover::before {
+    animation: glassShimmer 0.6s;
+}
+
+@keyframes glassShimmer {
+    0% { transform: rotate(45deg) translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: rotate(45deg) translateX(100%); opacity: 0; }
+}
+
+.glass-card.floating {
+    animation: cardFloat 8s ease-in-out infinite;
+}
+
+.glass-card.elevated {
+    transform: translateY(-20px);
+}
+
+.glass-card.centered {
+    margin: 0 auto;
+}
+
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-15px) rotate(1deg); }
+    50% { transform: translateY(-5px) rotate(-0.5deg); }
+    75% { transform: translateY(-10px) rotate(0.5deg); }
+}
+
+/* 光晕过渡带 */
+.glow-transition {
+    flex-shrink: 0;
+    width: 200px;
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transition-wave {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: waveFlow 3s ease-in-out infinite;
+}
+
+.transition-wave::before,
+.transition-wave::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    filter: blur(20px);
+}
+
+.transition-wave::before {
+    transform: translateY(-20px);
+    opacity: 0.5;
+}
+
+.transition-wave::after {
+    transform: translateY(20px);
+    opacity: 0.5;
+}
+
+@keyframes waveFlow {
+    0%, 100% { transform: scaleX(0.5); opacity: 0.3; }
+    50% { transform: scaleX(1); opacity: 1; }
+}
+
+/* 内容样式 */
+.segment-start {
+    min-width: 350px;
+}
+
+.card-glow {
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(
+        circle,
+        rgba(135, 206, 235, 0.3),
+        transparent
+    );
+    filter: blur(30px);
+    animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.title-gradient {
+    font-size: 42px;
+    font-weight: 700;
+    background: linear-gradient(
+        135deg,
+        #87CEEB,
+        #FFD700,
+        #FFB6C1
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+}
+
+.date-display {
+    font-size: 24px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.sparkles {
+    font-size: 32px;
+    animation: sparkle 2s ease infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 小窝区域 */
+.segment-home {
+    min-width: 400px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.icon-glow {
+    font-size: 32px;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
+
+.card-header h3 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.image-area {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.image-area:hover {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: var(--glow-soft);
+}
+
+.upload-hint {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.hint-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.fade-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+.image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        transparent 60%,
+        rgba(0, 0, 0, 0.3) 100%
+    );
+    pointer-events: none;
+}
+
+.glass-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.chip-icon {
+    font-size: 18px;
+}
+
+/* 心情河流 */
+.segment-mood {
+    min-width: 500px;
+}
+
+.mood-river {
+    padding: 30px;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #87CEEB, #FFB6C1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.mood-input-glass {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.emoji-ring {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.emoji-bubble {
+    width: 50px;
+    height: 50px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-elastic);
+}
+
+.emoji-bubble:hover,
+.emoji-bubble.active {
+    transform: scale(1.2);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.glass-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    color: white;
+    font-size: 16px;
+    resize: none;
+    transition: all 0.3s;
+}
+
+.glass-textarea:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 30px rgba(135, 206, 235, 0.3);
+}
+
+.glass-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.ripple-button {
+    position: relative;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #667eea, #00f2fe);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.ripple-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.ripple-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple-button:active .ripple-effect {
+    width: 300px;
+    height: 300px;
+}
+
+.mood-flow {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.mood-bubble {
+    flex-shrink: 0;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: bubbleFloat 6s ease-in-out infinite;
+}
+
+@keyframes bubbleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* 倒计时区域 */
+.segment-countdown {
+    min-width: 400px;
+}
+
+.countdown-orb {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 30px auto;
+}
+
+.orb-glow {
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(
+        circle,
+        rgba(135, 206, 235, 0.4),
+        transparent
+    );
+    filter: blur(30px);
+    animation: orbPulse 4s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+.orb-ring {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.orb-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.ring-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 3;
+}
+
+.ring-fill {
+    fill: none;
+    stroke: url(#orbGradient);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 565.48;
+    stroke-dashoffset: 565.48;
+    transition: stroke-dashoffset 1s var(--ease-smooth);
+}
+
+.orb-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.countdown-number {
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60A5FA, #A78BFA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.countdown-label {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.glass-date {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* 照片星河 */
+.segment-photos {
+    min-width: 600px;
+}
+
+.photo-galaxy {
+    padding: 30px;
+}
+
+.galaxy-container {
+    position: relative;
+    min-height: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.add-star {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-star:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.star-pulse {
+    text-align: center;
+    animation: starPulse 2s ease infinite;
+}
+
+@keyframes starPulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+.star-icon {
+    font-size: 32px;
+    display: block;
+}
+
+.star-text {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.photo-star {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+    animation: starFloat 10s ease-in-out infinite;
+}
+
+.photo-star:nth-child(odd) {
+    animation-delay: -2s;
+}
+
+.photo-star:nth-child(even) {
+    animation-delay: -5s;
+}
+
+@keyframes starFloat {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-10px) rotate(2deg); }
+    50% { transform: translateY(5px) rotate(-1deg); }
+    75% { transform: translateY(-5px) rotate(1deg); }
+}
+
+.photo-star img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-star:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+}
+
+/* 无限延伸 */
+.segment-infinite {
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.infinite-path {
+    text-align: center;
+}
+
+.path-dots {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.3s; }
+.dot:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.5); opacity: 1; }
+}
+
+.path-text {
+    font-size: 18px;
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* 浮动控制 */
+.float-controls {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 100;
+}
+
+.glass-fab {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.glass-fab:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.fab-icon {
+    font-size: 28px;
+}
+
+.fab-glow {
+    position: absolute;
+    inset: -10px;
+    background: radial-gradient(
+        circle,
+        rgba(255, 215, 0, 0.3),
+        transparent
+    );
+    filter: blur(20px);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.glass-fab:hover .fab-glow {
+    opacity: 1;
+}
+
+/* 滚动指示 */
+.scroll-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 50;
+}
+
+.indicator-wave {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent
+    );
+    animation: indicatorFlow 2s ease-in-out infinite;
+}
+
+@keyframes indicatorFlow {
+    0%, 100% { transform: translateX(-20px); opacity: 0.3; }
+    50% { transform: translateX(20px); opacity: 1; }
+}
+
+/* 拥抱效果 */
+.hug-effect {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hug-aurora {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(
+        circle,
+        rgba(100, 150, 250, 0.4),
+        rgba(255, 182, 193, 0.3),
+        transparent
+    );
+    filter: blur(50px);
+    animation: hugExpand 3s ease-out;
+}
+
+@keyframes hugExpand {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+.hug-hearts {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+}
+
+.float-heart {
+    position: absolute;
+    font-size: 40px;
+    left: 50%;
+    bottom: 0;
+    animation: heartFloat 3s ease-out forwards;
+    animation-delay: calc(var(--i) * 0.2s);
+}
+
+@keyframes heartFloat {
+    0% {
+        transform: translateX(-50%) translateY(0) scale(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translateX(-50%) translateY(-20px) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(calc(-50% + var(--i) * 20px - 50px)) translateY(-200px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+.hug-message {
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    animation: messageGlow 3s ease-out;
+}
+
+@keyframes messageGlow {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* 图片查看器 */
+.photo-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.viewer-glass {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+}
+
+.viewer-img {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.viewer-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.viewer-close:hover {
+    transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .flow-content {
+        padding: 0 20px;
+    }
+    
+    .glass-card {
+        padding: 30px 20px;
+    }
+    
+    .ribbon-segment {
+        padding: 0 15px;
+    }
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

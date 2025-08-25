@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
+    <title>时光纽带</title>
+    <link rel="stylesheet" href="styles-flow.css">
+</head>
+<body>
+    <!-- 密码验证 -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-backdrop"></div>
+        <div class="auth-modal">
+            <div class="auth-icon">
+                <div class="heart-pulse">💙</div>
+            </div>
+            <h1>时光纽带</h1>
+            <p>输入密码进入</p>
+            <div class="passcode-dots">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            <input type="tel" id="passcodeInput" pattern="[0-9]*" inputmode="numeric" maxlength="4" autocomplete="off">
+            <div class="auth-hint">密码提示：1314</div>
+        </div>
+    </div>
+
+    <!-- 初始设置 -->
+    <div id="setupScreen" class="setup-screen hidden">
+        <div class="setup-gradient"></div>
+        <div class="setup-content">
+            <h2>开始我们的故事</h2>
+            <div class="name-inputs">
+                <input type="text" id="yourName" placeholder="你的名字" maxlength="8">
+                <div class="heart-link">💙</div>
+                <input type="text" id="partnerName" placeholder="TA的名字" maxlength="8">
+            </div>
+            <div class="date-section">
+                <label>在一起的日子</label>
+                <input type="date" id="anniversaryDate">
+            </div>
+            <button id="beginBtn" class="glass-button">
+                <span>开始记录</span>
+                <div class="button-glow"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主界面 - 时光纽带 -->
+    <div id="mainFlow" class="main-flow hidden">
+        <!-- 动态背景 -->
+        <div class="flow-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+
+        <!-- 固定信息栏 -->
+        <div class="info-bar">
+            <div class="couple-info">
+                <span id="name1Display">名字</span>
+                <span class="heart-icon">💙</span>
+                <span id="name2Display">名字</span>
+            </div>
+            <div class="days-info">
+                <span class="days-number" id="daysNumber">0</span>
+                <span class="days-label">天</span>
+            </div>
+        </div>
+
+        <!-- 时光流容器 -->
+        <div class="time-flow" id="timeFlow">
+            <!-- 起点卡片 - 我们的故事 -->
+            <div class="flow-card card-start" data-depth="0.8">
+                <div class="card-glow"></div>
+                <div class="card-content">
+                    <h2>我们的故事</h2>
+                    <div class="start-date" id="startDate">2024.01.01</div>
+                    <div class="quote">爱是一场美丽的相遇</div>
+                </div>
+            </div>
+
+            <!-- 小窝卡片 -->
+            <div class="flow-card card-home" data-depth="0.6">
+                <div class="card-header">
+                    <span class="card-icon">🏠</span>
+                    <h3>我们的小窝</h3>
+                </div>
+                <div class="home-image-container" id="homeImageContainer">
+                    <input type="file" id="homeImageInput" accept="image/*" hidden>
+                    <div class="image-placeholder">
+                        <div class="upload-icon">📷</div>
+                        <p>点击上传照片</p>
+                    </div>
+                    <img id="homeImage" class="home-image hidden">
+                </div>
+            </div>
+
+            <!-- 今日心情卡片 -->
+            <div class="flow-card card-mood" data-depth="0.7">
+                <div class="card-header">
+                    <span class="card-icon">💭</span>
+                    <h3>今日心情</h3>
+                </div>
+                <div class="mood-selector">
+                    <button class="mood-emoji" data-mood="happy">😊</button>
+                    <button class="mood-emoji" data-mood="love">🥰</button>
+                    <button class="mood-emoji" data-mood="calm">😌</button>
+                    <button class="mood-emoji" data-mood="excited">🤗</button>
+                    <button class="mood-emoji" data-mood="miss">🥺</button>
+                </div>
+                <textarea id="moodText" placeholder="写下此刻的心情..." maxlength="50"></textarea>
+                <button id="saveMoodBtn" class="mini-button">保存</button>
+                <div class="recent-moods" id="recentMoods"></div>
+            </div>
+
+            <!-- 倒计时卡片 -->
+            <div class="flow-card card-countdown" data-depth="0.5">
+                <div class="card-header">
+                    <span class="card-icon">⏰</span>
+                    <h3>期待相见</h3>
+                </div>
+                <div class="countdown-display">
+                    <div class="countdown-ring">
+                        <svg viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="54" class="ring-bg"/>
+                            <circle cx="60" cy="60" r="54" class="ring-progress" id="progressRing"/>
+                        </svg>
+                        <div class="countdown-center">
+                            <span class="countdown-num" id="countdownNum">0</span>
+                            <span class="countdown-unit">天</span>
+                        </div>
+                    </div>
+                    <input type="date" id="nextMeetDate" class="glass-input">
+                </div>
+            </div>
+
+            <!-- 每日一句卡片 -->
+            <div class="flow-card card-quote" data-depth="0.9">
+                <div class="quote-content">
+                    <span class="quote-mark">"</span>
+                    <p id="dailyQuote">爱是耐心，爱是善良，爱永不止息</p>
+                    <span class="quote-mark">"</span>
+                </div>
+            </div>
+
+            <!-- 照片记忆区 -->
+            <div class="memory-section">
+                <h2 class="section-title">时光印记</h2>
+                <div class="photo-river" id="photoRiver">
+                    <!-- 添加照片按钮 -->
+                    <div class="photo-float add-photo" id="addPhotoBtn">
+                        <input type="file" id="photoUpload" accept="image/*" multiple hidden>
+                        <div class="add-icon">+</div>
+                    </div>
+                    <!-- 照片动态生成 -->
+                </div>
+            </div>
+
+            <!-- 纽带延伸 -->
+            <div class="ribbon-extend" id="ribbonExtend">
+                <div class="ribbon-line"></div>
+                <div class="ribbon-text">我们的故事还在继续...</div>
+            </div>
+        </div>
+
+        <!-- 浮动操作按钮 -->
+        <div class="float-actions">
+            <button id="hugBtn" class="action-button hug-button">
+                <span class="button-emoji">🤗</span>
+                <span class="button-text">拥抱</span>
+            </button>
+            <button id="settingsBtn" class="action-button settings-button">
+                <span class="button-emoji">⚙️</span>
+            </button>
+        </div>
+
+        <!-- 滚动提示 -->
+        <div class="scroll-hint" id="scrollHint">
+            <div class="scroll-arrow">→</div>
+            <span>滑动探索更多</span>
+        </div>
+    </div>
+
+    <!-- 拥抱动画 -->
+    <div id="hugOverlay" class="hug-overlay hidden">
+        <div class="hug-wave"></div>
+        <div class="hug-hearts">
+            <span class="floating-heart" style="--delay: 0">💙</span>
+            <span class="floating-heart" style="--delay: 0.2s">💜</span>
+            <span class="floating-heart" style="--delay: 0.4s">💙</span>
+            <span class="floating-heart" style="--delay: 0.6s">💜</span>
+            <span class="floating-heart" style="--delay: 0.8s">💙</span>
+        </div>
+        <div class="hug-text">温暖的拥抱已送达</div>
+    </div>
+
+    <!-- 图片查看器 -->
+    <div id="imageViewer" class="image-viewer hidden">
+        <div class="viewer-backdrop"></div>
+        <img id="viewerImg" class="viewer-image">
+        <button id="closeViewer" class="viewer-close">×</button>
+    </div>
+
+    <script src="app-flow.js"></script>
+</body>
+</html>

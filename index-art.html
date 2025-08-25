@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>时光纽带</title>
+    <link rel="stylesheet" href="styles-art.css">
+</head>
+<body>
+    <!-- 开场动画 -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-heart">
+                <svg viewBox="0 0 100 100" width="100" height="100">
+                    <defs>
+                        <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M50,25 C50,25 30,0 10,25 C-10,50 25,75 50,90 C75,75 110,50 90,25 C70,0 50,25 50,25 Z" 
+                          fill="url(#heartGradient)" />
+                </svg>
+            </div>
+            <h1 class="splash-title">时光纽带</h1>
+            <div class="splash-loading">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 密码验证 - 极简设计 -->
+    <div id="authScreen" class="auth-screen hidden">
+        <div class="auth-background">
+            <canvas id="particleCanvas"></canvas>
+        </div>
+        <div class="auth-container">
+            <div class="auth-logo">
+                <div class="logo-circle">
+                    <span class="logo-text">💙</span>
+                </div>
+            </div>
+            <h2 class="auth-title">Welcome</h2>
+            <div class="auth-input-wrapper">
+                <input type="tel" id="authCode" placeholder="Enter Code" maxlength="4" 
+                       pattern="[0-9]*" inputmode="numeric" autocomplete="off">
+                <div class="input-underline"></div>
+            </div>
+            <div class="auth-feedback" id="authFeedback"></div>
+        </div>
+    </div>
+
+    <!-- 初始化设置 - 卡片式 -->
+    <div id="setupScreen" class="setup-screen hidden">
+        <div class="setup-backdrop"></div>
+        <div class="setup-card">
+            <div class="setup-header">
+                <h2>开始我们的故事</h2>
+                <p>记录属于两个人的时光</p>
+            </div>
+            <div class="setup-body">
+                <div class="input-group">
+                    <input type="text" id="setupName1" required>
+                    <label>你的名字</label>
+                    <span class="input-focus"></span>
+                </div>
+                <div class="heart-connector">
+                    <span class="connector-line"></span>
+                    <span class="connector-heart">💙</span>
+                    <span class="connector-line"></span>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="setupName2" required>
+                    <label>TA的名字</label>
+                    <span class="input-focus"></span>
+                </div>
+                <div class="input-group date-group">
+                    <input type="date" id="setupDate" required>
+                    <label>纪念日</label>
+                    <span class="input-focus"></span>
+                </div>
+            </div>
+            <button id="setupBtn" class="setup-button">
+                <span class="button-text">开始</span>
+                <span class="button-ripple"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主体 - 时光纽带 -->
+    <div id="mainCanvas" class="main-canvas hidden">
+        <!-- 环境光效 -->
+        <div class="ambient-layer">
+            <div class="ambient-gradient gradient-1"></div>
+            <div class="ambient-gradient gradient-2"></div>
+            <div class="ambient-gradient gradient-3"></div>
+        </div>
+
+        <!-- 动态头部 -->
+        <header class="dynamic-header">
+            <div class="header-content">
+                <div class="header-names">
+                    <span id="headerName1">Name</span>
+                    <span class="header-heart">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
+                                  fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span id="headerName2">Name</span>
+                </div>
+                <div class="header-days">
+                    <span class="days-num" id="headerDays">0</span>
+                    <span class="days-unit">Days</span>
+                </div>
+            </div>
+            <button id="menuBtn" class="menu-button">
+                <span class="menu-dot"></span>
+                <span class="menu-dot"></span>
+                <span class="menu-dot"></span>
+            </button>
+        </header>
+
+        <!-- 时光流 - 连续纽带 -->
+        <div class="time-ribbon" id="timeRibbon">
+            <!-- 起始点 -->
+            <section class="ribbon-node node-origin">
+                <div class="node-content">
+                    <div class="origin-circle">
+                        <div class="circle-ripple"></div>
+                        <div class="circle-core">
+                            <span class="origin-date" id="originDate">2024.01.01</span>
+                        </div>
+                    </div>
+                    <h2 class="origin-title">Our Story Begins</h2>
+                </div>
+            </section>
+
+            <!-- 连接纽带 -->
+            <div class="ribbon-connector">
+                <svg class="connector-svg" viewBox="0 0 200 100">
+                    <path d="M0,50 Q50,20 100,50 T200,50" class="connector-path"/>
+                </svg>
+            </div>
+
+            <!-- 小窝节点 -->
+            <section class="ribbon-node node-home">
+                <div class="node-card">
+                    <h3 class="node-title">
+                        <span class="title-icon">🏠</span>
+                        <span>我们的小窝</span>
+                    </h3>
+                    <div class="home-container">
+                        <div class="home-image-box" id="homeImageBox">
+                            <input type="file" id="homeFile" accept="image/*" hidden>
+                            <div class="image-placeholder">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                                <p>添加照片</p>
+                            </div>
+                            <img id="homeImg" class="home-img hidden">
+                        </div>
+                        <div class="home-quote">
+                            <span class="quote-icon">✨</span>
+                            <span id="homeQuote">家是有你的地方</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 连接纽带 -->
+            <div class="ribbon-connector">
+                <svg class="connector-svg" viewBox="0 0 200 100">
+                    <path d="M0,50 Q50,80 100,50 T200,50" class="connector-path"/>
+                </svg>
+            </div>
+
+            <!-- 心情节点 -->
+            <section class="ribbon-node node-mood">
+                <div class="node-card expanded">
+                    <h3 class="node-title">
+                        <span class="title-icon">💭</span>
+                        <span>心情涟漪</span>
+                    </h3>
+                    <div class="mood-creator">
+                        <div class="mood-bubbles">
+                            <button class="mood-bubble" data-mood="happy">😊</button>
+                            <button class="mood-bubble" data-mood="love">🥰</button>
+                            <button class="mood-bubble" data-mood="calm">😌</button>
+                            <button class="mood-bubble" data-mood="miss">🥺</button>
+                            <button class="mood-bubble" data-mood="excited">✨</button>
+                        </div>
+                        <div class="mood-input-area">
+                            <textarea id="moodText" placeholder="此刻想说..." maxlength="100"></textarea>
+                            <button id="moodSend" class="mood-send">
+                                <svg width="20" height="20" viewBox="0 0 24 24">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mood-history" id="moodHistory">
+                        <!-- 动态生成心情历史 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 连接纽带 -->
+            <div class="ribbon-connector">
+                <svg class="connector-svg" viewBox="0 0 200 100">
+                    <path d="M0,50 Q50,20 100,50 T200,50" class="connector-path"/>
+                </svg>
+            </div>
+
+            <!-- 倒计时节点 -->
+            <section class="ribbon-node node-countdown">
+                <div class="node-card">
+                    <h3 class="node-title">
+                        <span class="title-icon">⏰</span>
+                        <span>期待重逢</span>
+                    </h3>
+                    <div class="countdown-container">
+                        <div class="countdown-circle">
+                            <svg viewBox="0 0 200 200">
+                                <defs>
+                                    <linearGradient id="countGradient">
+                                        <stop offset="0%" style="stop-color:#667eea"/>
+                                        <stop offset="100%" style="stop-color:#764ba2"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="100" cy="100" r="90" class="circle-bg"/>
+                                <circle cx="100" cy="100" r="90" class="circle-progress" 
+                                        id="progressCircle" stroke="url(#countGradient)"/>
+                            </svg>
+                            <div class="countdown-value">
+                                <span class="count-number" id="countNumber">0</span>
+                                <span class="count-unit">天</span>
+                            </div>
+                        </div>
+                        <input type="date" id="nextDate" class="date-input">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 连接纽带 -->
+            <div class="ribbon-connector">
+                <svg class="connector-svg" viewBox="0 0 200 100">
+                    <path d="M0,50 Q50,80 100,50 T200,50" class="connector-path"/>
+                </svg>
+            </div>
+
+            <!-- 照片流节点 -->
+            <section class="ribbon-node node-photos">
+                <div class="node-card wide">
+                    <h3 class="node-title">
+                        <span class="title-icon">📸</span>
+                        <span>时光碎片</span>
+                    </h3>
+                    <div class="photo-stream" id="photoStream">
+                        <div class="photo-add" id="photoAdd">
+                            <input type="file" id="photoFile" accept="image/*" multiple hidden>
+                            <div class="add-icon">
+                                <svg width="30" height="30" viewBox="0 0 24 24">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- 动态生成照片 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 延续... -->
+            <div class="ribbon-infinite">
+                <div class="infinite-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <p class="infinite-text">故事还在继续...</p>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="quick-actions">
+            <button id="hugButton" class="action-button hug-btn">
+                <span class="btn-icon">🤗</span>
+                <span class="btn-text">拥抱</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 拥抱动画 -->
+    <div id="hugOverlay" class="hug-overlay hidden">
+        <div class="hug-wave wave-1"></div>
+        <div class="hug-wave wave-2"></div>
+        <div class="hug-wave wave-3"></div>
+        <div class="hug-emoji">🤗</div>
+        <div class="hug-text">温暖的拥抱</div>
+    </div>
+
+    <!-- 图片查看器 -->
+    <div id="imageViewer" class="image-viewer hidden">
+        <div class="viewer-backdrop"></div>
+        <img id="viewerImg" class="viewer-image">
+        <button id="viewerClose" class="viewer-close">
+            <svg width="30" height="30" viewBox="0 0 24 24">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" 
+                      fill="currentColor"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- 菜单 -->
+    <div id="menuPanel" class="menu-panel hidden">
+        <div class="menu-backdrop"></div>
+        <div class="menu-content">
+            <button id="editSetup" class="menu-item">
+                <span class="item-icon">⚙️</span>
+                <span>设置</span>
+            </button>
+            <button id="clearData" class="menu-item">
+                <span class="item-icon">🗑️</span>
+                <span>清除数据</span>
+            </button>
+            <button id="menuClose" class="menu-item">
+                <span class="item-icon">✕</span>
+                <span>关闭</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="app-art.js"></script>
+</body>
+</html>

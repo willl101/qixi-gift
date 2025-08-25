@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
+    <title>时光纽带</title>
+    <link rel="stylesheet" href="styles-ribbon.css">
+</head>
+<body>
+    <!-- 认证层 -->
+    <div id="authLayer" class="auth-layer">
+        <div class="aurora-bg">
+            <div class="aurora-gradient"></div>
+            <div class="aurora-light"></div>
+        </div>
+        <div class="glass-panel">
+            <div class="auth-content">
+                <div class="logo-heart">💙</div>
+                <h1 class="gradient-text">时光纽带</h1>
+                <div class="passcode-field">
+                    <input type="tel" id="passcode" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••">
+                    <div class="passcode-glow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 初始设置 -->
+    <div id="setupLayer" class="setup-layer hidden">
+        <div class="setup-glass">
+            <h2 class="gradient-text">初次见面</h2>
+            <div class="name-field">
+                <input type="text" id="name1" placeholder="你的名字">
+                <span class="link-heart">💙</span>
+                <input type="text" id="name2" placeholder="TA的名字">
+            </div>
+            <input type="date" id="anniversary" class="date-field">
+            <button id="startBtn" class="glow-button">开始记录</button>
+        </div>
+    </div>
+
+    <!-- 主内容 - 无缝纽带 -->
+    <div id="mainRibbon" class="main-ribbon hidden">
+        <!-- 动态光晕背景 -->
+        <div class="ambient-light">
+            <div class="light-beam beam-1"></div>
+            <div class="light-beam beam-2"></div>
+            <div class="light-beam beam-3"></div>
+            <div class="sun-glow"></div>
+        </div>
+
+        <!-- 浮动信息条 -->
+        <div class="info-glass">
+            <div class="couple-badge">
+                <span id="displayName1">名字</span>
+                <span class="pulse-heart">💙</span>
+                <span id="displayName2">名字</span>
+            </div>
+            <div class="days-badge">
+                <span id="daysCount">0</span>
+                <span class="days-text">天</span>
+            </div>
+        </div>
+
+        <!-- 无缝纽带容器 -->
+        <div class="ribbon-container" id="ribbonContainer">
+            <!-- 纽带光晕 -->
+            <div class="ribbon-glow">
+                <div class="glow-path"></div>
+            </div>
+
+            <!-- 流动内容 -->
+            <div class="flow-content" id="flowContent">
+                
+                <!-- 起点 - 故事开始 -->
+                <section class="ribbon-segment segment-start">
+                    <div class="glass-card floating" data-float="1">
+                        <div class="card-glow"></div>
+                        <div class="card-inner">
+                            <h2 class="title-gradient">Our Story</h2>
+                            <div class="date-display" id="startDateDisplay">2024.01.01</div>
+                            <div class="sparkles">✨</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 光晕过渡带 -->
+                <div class="glow-transition transition-1">
+                    <div class="transition-wave"></div>
+                </div>
+
+                <!-- 小窝 -->
+                <section class="ribbon-segment segment-home">
+                    <div class="glass-card elevated" data-float="2">
+                        <div class="card-header">
+                            <span class="icon-glow">🏠</span>
+                            <h3>我们的小窝</h3>
+                        </div>
+                        <div class="image-area" id="homeImageArea">
+                            <input type="file" id="homeImageInput" accept="image/*" hidden>
+                            <div class="upload-hint">
+                                <div class="hint-icon">📸</div>
+                                <p>点击添加照片</p>
+                            </div>
+                            <img id="homeImage" class="fade-image hidden">
+                            <div class="image-overlay"></div>
+                        </div>
+                        <div class="daily-message glass-chip">
+                            <span class="chip-icon">💫</span>
+                            <span id="dailyMessage">每一天都是礼物</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 光晕过渡带 -->
+                <div class="glow-transition transition-2">
+                    <div class="transition-wave"></div>
+                </div>
+
+                <!-- 心情河流 -->
+                <section class="ribbon-segment segment-mood">
+                    <div class="mood-river">
+                        <h3 class="section-title">心情涟漪</h3>
+                        <div class="mood-input-glass">
+                            <div class="emoji-ring">
+                                <button class="emoji-bubble" data-emoji="😊">😊</button>
+                                <button class="emoji-bubble" data-emoji="🥰">🥰</button>
+                                <button class="emoji-bubble" data-emoji="😌">😌</button>
+                                <button class="emoji-bubble" data-emoji="🤗">🤗</button>
+                                <button class="emoji-bubble" data-emoji="💭">💭</button>
+                            </div>
+                            <textarea id="moodInput" class="glass-textarea" placeholder="此刻的心情..." maxlength="60"></textarea>
+                            <button id="addMoodBtn" class="ripple-button">
+                                <span>记录</span>
+                                <div class="ripple-effect"></div>
+                            </button>
+                        </div>
+                        <div class="mood-flow" id="moodFlow">
+                            <!-- 心情气泡动态生成 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 光晕过渡带 -->
+                <div class="glow-transition transition-3">
+                    <div class="transition-wave"></div>
+                </div>
+
+                <!-- 倒计时光环 -->
+                <section class="ribbon-segment segment-countdown">
+                    <div class="glass-card centered" data-float="3">
+                        <h3 class="section-title">期待重逢</h3>
+                        <div class="countdown-orb">
+                            <div class="orb-glow"></div>
+                            <div class="orb-ring">
+                                <svg viewBox="0 0 200 200">
+                                    <defs>
+                                        <linearGradient id="orbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#60A5FA"/>
+                                            <stop offset="100%" style="stop-color:#A78BFA"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="100" cy="100" r="90" class="ring-track"/>
+                                    <circle cx="100" cy="100" r="90" class="ring-fill" id="countdownRing"/>
+                                </svg>
+                            </div>
+                            <div class="orb-center">
+                                <div class="countdown-number" id="countdownDays">0</div>
+                                <div class="countdown-label">Days</div>
+                            </div>
+                        </div>
+                        <input type="date" id="meetDate" class="glass-date">
+                    </div>
+                </section>
+
+                <!-- 光晕过渡带 -->
+                <div class="glow-transition transition-4">
+                    <div class="transition-wave"></div>
+                </div>
+
+                <!-- 照片星河 -->
+                <section class="ribbon-segment segment-photos">
+                    <div class="photo-galaxy">
+                        <h3 class="section-title">记忆星河</h3>
+                        <div class="galaxy-container" id="galaxyContainer">
+                            <div class="add-star" id="addPhotoBtn">
+                                <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                                <div class="star-pulse">
+                                    <span class="star-icon">✨</span>
+                                    <span class="star-text">添加</span>
+                                </div>
+                            </div>
+                            <!-- 照片星星动态生成 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 无限延伸 -->
+                <section class="ribbon-segment segment-infinite">
+                    <div class="infinite-path">
+                        <div class="path-dots">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                        <p class="path-text">To Be Continued...</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- 浮动操作 -->
+        <div class="float-controls">
+            <button id="hugBtn" class="glass-fab">
+                <span class="fab-icon">🤗</span>
+                <span class="fab-glow"></span>
+            </button>
+        </div>
+
+        <!-- 滚动指示 -->
+        <div class="scroll-indicator">
+            <div class="indicator-wave"></div>
+        </div>
+    </div>
+
+    <!-- 拥抱效果 -->
+    <div id="hugEffect" class="hug-effect hidden">
+        <div class="hug-aurora"></div>
+        <div class="hug-hearts">
+            <span class="float-heart" style="--i: 1">💙</span>
+            <span class="float-heart" style="--i: 2">💜</span>
+            <span class="float-heart" style="--i: 3">💙</span>
+            <span class="float-heart" style="--i: 4">💜</span>
+            <span class="float-heart" style="--i: 5">💙</span>
+        </div>
+        <div class="hug-message">Warm Hug Sent</div>
+    </div>
+
+    <!-- 图片查看器 -->
+    <div id="photoViewer" class="photo-viewer hidden">
+        <div class="viewer-glass"></div>
+        <img id="viewerImage" class="viewer-img">
+        <button id="closeViewer" class="viewer-close">×</button>
+    </div>
+
+    <script src="app-ribbon.js"></script>
+</body>
+</html>

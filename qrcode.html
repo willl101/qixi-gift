@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>时光纽带 - 二维码</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        #qrcode {
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        p {
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+        .url {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>📱 扫码访问时光纽带</h1>
+    <div id="qrcode"></div>
+    <div class="url" id="url"></div>
+    <p>手机扫描二维码即可访问</p>
+    
+    <script>
+        // 获取当前网络地址
+        const currentUrl = window.location.href.replace('qrcode.html', 'index-time.html');
+        
+        // 如果是本地访问，使用局域网IP
+        let url = currentUrl;
+        if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
+            url = 'http://10.75.185.36:8081/index-time.html';
+        }
+        
+        // 显示URL
+        document.getElementById('url').textContent = url;
+        
+        // 生成二维码
+        new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 256,
+            height: 256,
+            colorDark : "#667eea",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>
