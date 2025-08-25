@@ -2,3 +2,22 @@
 .DS_Store
 *.log
 node_modules/
+
+# 忽略Claude配置文件
+.claude/
+
+# 忽略个人配置和缓存
+*.local
+*.cache
+*.tmp
+
+# 忽略编辑器配置
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 忽略环境变量文件
+.env
+.env.local
+.env.*.local
