@@ -1,16 +1,17 @@
-// Firebase配置
-const firebaseConfig = {
-    apiKey: "AIzaSyDYkV5BH0uLR6FOheiHPVGTfgvRqtI_mxo",
-    authDomain: "love-link-sync.firebaseapp.com",
-    databaseURL: "https://love-link-sync-default-rtdb.firebaseio.com",
-    projectId: "love-link-sync",
-    storageBucket: "love-link-sync.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:abcdef123456789012"
-};
-
-// 初始化Firebase
-firebase.initializeApp(firebaseConfig);
+// Firebase 已在 firebase-config.js 中初始化
+// 如果未初始化，则使用默认配置
+if (!firebase.apps.length) {
+    const firebaseConfig = {
+        apiKey: "AIzaSyDK99Moaa3L0_TFc9p0LyTcmrRzPx3RWbw",
+        authDomain: "love-link-989a6.firebaseapp.com",
+        databaseURL: "https://love-link-989a6-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "love-link-989a6",
+        storageBucket: "love-link-989a6.firebasestorage.app",
+        messagingSenderId: "361361703581",
+        appId: "1:361361703581:web:34fe50a26109da28d60a74"
+    };
+    firebase.initializeApp(firebaseConfig);
+}
 const database = firebase.database();
 const storage = firebase.storage();
 

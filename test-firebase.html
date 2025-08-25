@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 连接测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .test-result {
+            color: #666;
+            font-size: 14px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .room-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4A90E2;
+            text-align: center;
+            padding: 20px;
+            background: #e7f3ff;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        input {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Firebase 配置 -->
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase 连接测试</h1>
+        
+        <div id="status" class="status pending">
+            正在初始化 Firebase...
+        </div>
+        
+        <div id="tests"></div>
+        
+        <div class="room-code" id="roomCodeDisplay" style="display: none;">
+            房间代码：<span id="roomCode"></span>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <input type="text" id="testMessage" placeholder="输入测试消息" style="width: 300px;">
+            <br>
+            <button onclick="testWrite()">测试写入数据</button>
+            <button onclick="testRead()">测试读取数据</button>
+            <button onclick="testStorage()">测试存储服务</button>
+        </div>
+        
+        <div id="results" style="margin-top: 30px;"></div>
+    </div>
+
+    <script>
+        let database, storage;
+        let roomCode = 'TEST' + Math.random().toString(36).substr(2, 2).toUpperCase();
+        
+        // 测试 Firebase 初始化
+        function testFirebaseInit() {
+            const testsDiv = document.getElementById('tests');
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // 检查 Firebase 是否已初始化
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK 未加载');
+                }
+                
+                if (!firebase.apps.length) {
+                    throw new Error('Firebase 未初始化');
+                }
+                
+                // 获取服务实例
+                database = firebase.database();
+                storage = firebase.storage();
+                
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Firebase 已成功初始化！';
+                
+                // 显示配置信息
+                const app = firebase.app();
+                const config = app.options;
+                
+                testsDiv.innerHTML = `
+                    <div class="test-item">
+                        <div class="test-title">✅ 项目 ID</div>
+                        <div class="test-result">${config.projectId}</div>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-title">✅ 数据库 URL</div>
+                        <div class="test-result">${config.databaseURL}</div>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-title">✅ 存储桶</div>
+                        <div class="test-result">${config.storageBucket}</div>
+                    </div>
+                `;
+                
+                // 显示房间代码
+                document.getElementById('roomCode').textContent = roomCode;
+                document.getElementById('roomCodeDisplay').style.display = 'block';
+                
+                // 监听数据变化
+                listenToData();
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ 初始化失败：${error.message}`;
+                console.error('Firebase 初始化错误:', error);
+            }
+        }
+        
+        // 测试写入数据
+        async function testWrite() {
+            const message = document.getElementById('testMessage').value || '测试消息';
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                const testData = {
+                    message: message,
+                    timestamp: Date.now(),
+                    roomCode: roomCode,
+                    browser: navigator.userAgent
+                };
+                
+                await database.ref(`test/${roomCode}/messages`).push(testData);
+                
+                resultsDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ 数据写入成功！<br>
+                        消息：${message}<br>
+                        房间：${roomCode}<br>
+                        时间：${new Date().toLocaleString('zh-CN')}
+                    </div>
+                ` + resultsDiv.innerHTML;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ 写入失败：${error.message}
+                    </div>
+                ` + resultsDiv.innerHTML;
+            }
+        }
+        
+        // 测试读取数据
+        async function testRead() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                const snapshot = await database.ref(`test/${roomCode}/messages`).once('value');
+                const data = snapshot.val();
+                
+                if (data) {
+                    const messages = Object.values(data);
+                    const latest = messages[messages.length - 1];
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ 数据读取成功！<br>
+                            共 ${messages.length} 条消息<br>
+                            最新消息：${latest.message}<br>
+                            发送时间：${new Date(latest.timestamp).toLocaleString('zh-CN')}
+                        </div>
+                    ` + resultsDiv.innerHTML;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="status pending">
+                            ⚠️ 房间 ${roomCode} 暂无数据
+                        </div>
+                    ` + resultsDiv.innerHTML;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ 读取失败：${error.message}
+                    </div>
+                ` + resultsDiv.innerHTML;
+            }
+        }
+        
+        // 测试存储服务
+        async function testStorage() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // 创建测试文件
+                const testContent = `测试文件 - ${new Date().toISOString()}`;
+                const blob = new Blob([testContent], { type: 'text/plain' });
+                
+                // 上传到 Storage
+                const ref = storage.ref(`test/${roomCode}/test.txt`);
+                const snapshot = await ref.put(blob);
+                const url = await snapshot.ref.getDownloadURL();
+                
+                resultsDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ 存储测试成功！<br>
+                        文件已上传<br>
+                        <a href="${url}" target="_blank">查看文件</a>
+                    </div>
+                ` + resultsDiv.innerHTML;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ 存储测试失败：${error.message}<br>
+                        提示：请确保已在 Firebase Console 中启用 Storage
+                    </div>
+                ` + resultsDiv.innerHTML;
+            }
+        }
+        
+        // 监听实时数据
+        function listenToData() {
+            database.ref(`test/${roomCode}/messages`).on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                const resultsDiv = document.getElementById('results');
+                
+                resultsDiv.innerHTML = `
+                    <div class="status success" style="background: #e7f3ff; border-color: #4A90E2;">
+                        🔔 收到实时消息：${data.message}<br>
+                        时间：${new Date(data.timestamp).toLocaleString('zh-CN')}
+                    </div>
+                ` + resultsDiv.innerHTML;
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(testFirebaseInit, 500);
+        });
+    </script>
+</body>
+</html>
