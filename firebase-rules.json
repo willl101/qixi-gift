@@ -1,0 +1,26 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "rooms": {
+      "$roomId": {
+        ".read": true,
+        ".write": true,
+        "photos": {
+          "$photoId": {
+            ".validate": "newData.hasChildren(['url', 'timestamp'])"
+          }
+        },
+        "moods": {
+          "$moodId": {
+            ".validate": "newData.hasChildren(['text', 'timestamp'])"
+          }
+        }
+      }
+    },
+    "test": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

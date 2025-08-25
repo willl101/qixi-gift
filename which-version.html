@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>版本检查 - 时光纽带</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .version-card {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        .version-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .local-version {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .sync-version {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .version-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .version-desc {
+            color: #666;
+            margin: 10px 0;
+        }
+        .feature-list {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        .feature-list li {
+            margin: 5px 0;
+        }
+        .warning {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .current {
+            background: #28a745;
+        }
+        .room-code-display {
+            text-align: center;
+            padding: 20px;
+            background: #e7f3ff;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .room-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4A90E2;
+            letter-spacing: 5px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4A90E2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 检查你使用的版本</h1>
+        
+        <div class="warning">
+            <strong>⚠️ 重要提示：</strong><br>
+            只有使用<strong>实时同步版</strong>才能让两个设备看到相同的照片！<br>
+            普通版本的数据只存在设备本地，不会同步到云端。
+        </div>
+        
+        <div class="version-card local-version">
+            <div class="version-title">📱 普通版本 (本地存储)</div>
+            <div class="version-desc">
+                <strong>网址：</strong>index.html<br>
+                <strong>特点：</strong>
+                <ul class="feature-list">
+                    <li>❌ 数据只存在当前设备</li>
+                    <li>❌ 换设备后看不到之前的内容</li>
+                    <li>❌ 两个人看到的内容不同</li>
+                    <li>✅ 不需要网络，纯本地运行</li>
+                </ul>
+            </div>
+            <button onclick="window.location.href='index.html'">打开普通版本</button>
+        </div>
+        
+        <div class="version-card sync-version">
+            <div class="version-title">☁️ 实时同步版 (云端存储)</div>
+            <div class="version-desc">
+                <strong>网址：</strong>index-sync.html<br>
+                <strong>特点：</strong>
+                <ul class="feature-list">
+                    <li>✅ 数据存储在云端</li>
+                    <li>✅ 任何设备都能看到相同内容</li>
+                    <li>✅ 实时同步，立即生效</li>
+                    <li>✅ 使用房间代码连接两个设备</li>
+                </ul>
+            </div>
+            <button class="current" onclick="window.location.href='index-sync.html'">
+                ⭐ 打开实时同步版（推荐）
+            </button>
+        </div>
+        
+        <div class="success">
+            <h3>📱 如何实现同步？</h3>
+            <div class="step">
+                <strong>步骤 1：</strong>两个设备都打开 <code>index-sync.html</code>
+            </div>
+            <div class="step">
+                <strong>步骤 2：</strong>输入密码 <code>1314</code>
+            </div>
+            <div class="step">
+                <strong>步骤 3：</strong>第一个设备会自动生成房间代码（如：ABC123）
+            </div>
+            <div class="step">
+                <strong>步骤 4：</strong>第二个设备在设置中输入相同的房间代码
+            </div>
+            <div class="step">
+                <strong>步骤 5：</strong>完成！现在上传的照片会立即同步
+            </div>
+        </div>
+        
+        <div class="room-code-display">
+            <p>确保两个设备使用相同的房间代码：</p>
+            <div class="room-code" id="roomCode">------</div>
+            <small>（打开实时同步版后可在设置中查看）</small>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="testSync()" style="background: #28a745;">
+                🔧 测试 Firebase 连接
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // 检查本地存储的房间代码
+        const roomCode = localStorage.getItem('timeFlow_roomCode');
+        if (roomCode) {
+            document.getElementById('roomCode').textContent = roomCode;
+        }
+        
+        function testSync() {
+            window.location.href = 'test-firebase.html';
+        }
+        
+        // 检查当前使用的版本
+        const currentPage = window.location.pathname;
+        if (currentPage.includes('index-sync.html')) {
+            alert('✅ 你正在使用实时同步版！');
+        } else if (currentPage.includes('index.html')) {
+            alert('⚠️ 你正在使用普通版本，数据不会同步！请切换到 index-sync.html');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 允许所有用户读写（测试阶段）
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+    
+    // 更严格的规则（生产环境可选）
+    // match /rooms/{roomId}/{allPaths=**} {
+    //   allow read: if true;
+    //   allow write: if request.resource.size < 10 * 1024 * 1024; // 限制10MB
+    // }
+  }
+}
