@@ -45,12 +45,12 @@
     
     <script>
         // 获取当前网络地址
-        const currentUrl = window.location.href.replace('qrcode.html', 'index-time.html');
+        const currentUrl = window.location.href.replace('qrcode.html', 'index.html');
         
         // 如果是本地访问，使用局域网IP
         let url = currentUrl;
         if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
-            url = 'http://10.75.185.36:8081/index-time.html';
+            url = 'http://192.168.9.192:8082/index.html';
         }
         
         // 显示URL
