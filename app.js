@@ -40,6 +40,9 @@ class TimeFlow {
         
         // 初始化滚动效果
         this.initScrollEffects();
+        
+        // 初始化数据同步功能
+        this.initDataSync();
     }
     
     // 初始化IndexedDB
@@ -679,6 +682,323 @@ class TimeFlow {
         setTimeout(() => {
             document.body.removeChild(feedback);
         }, 2000);
+    }
+    
+    // 初始化数据同步功能
+    initDataSync() {
+        // 添加同步按钮
+        this.addSyncButtons();
+        
+        // 检查URL参数中的共享数据
+        this.checkSharedData();
+    }
+    
+    // 添加同步按钮
+    addSyncButtons() {
+        // 创建浮动按钮
+        const syncBtn = document.createElement('button');
+        syncBtn.innerHTML = '🔄';
+        syncBtn.title = '数据同步';
+        syncBtn.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+            transition: transform 0.3s;
+        `;
+        
+        syncBtn.onmouseover = () => {
+            syncBtn.style.transform = 'scale(1.1)';
+        };
+        
+        syncBtn.onmouseout = () => {
+            syncBtn.style.transform = 'scale(1)';
+        };
+        
+        syncBtn.onclick = () => this.showSyncMenu();
+        
+        document.body.appendChild(syncBtn);
+    }
+    
+    // 显示同步菜单
+    showSyncMenu() {
+        const modal = document.createElement('div');
+        modal.className = 'sync-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+        
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+        `;
+        
+        content.innerHTML = `
+            <h2 style="color: #4A90E2; margin-bottom: 20px; text-align: center;">📱 数据同步</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px; text-align: center;">
+                让另一半也能看到你的照片和心情 💕
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button id="exportDataBtn" style="
+                    padding: 15px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    transition: opacity 0.3s;
+                " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    📥 导出数据文件
+                    <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">
+                        保存所有照片和心情到文件
+                    </div>
+                </button>
+                
+                <button id="importDataBtn" style="
+                    padding: 15px;
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    transition: opacity 0.3s;
+                " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    📤 导入数据文件
+                    <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">
+                        从另一半发来的文件同步数据
+                    </div>
+                </button>
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 10px 0;">
+                
+                <button id="closeSyncBtn" style="
+                    padding: 12px;
+                    background: #f0f0f0;
+                    color: #666;
+                    border: none;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    font-size: 14px;
+                ">取消</button>
+            </div>
+        `;
+        
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // 绑定事件
+        document.getElementById('exportDataBtn').onclick = () => {
+            this.exportData();
+            modal.remove();
+        };
+        
+        document.getElementById('importDataBtn').onclick = () => {
+            this.importData();
+            modal.remove();
+        };
+        
+        document.getElementById('closeSyncBtn').onclick = () => {
+            modal.remove();
+        };
+        
+        // 点击背景关闭
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        };
+    }
+    
+    // 导出数据
+    async exportData() {
+        try {
+            const data = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                exportBy: localStorage.getItem(this.config.storageKey + 'name1') || this.preset.name1,
+                config: {
+                    name1: localStorage.getItem(this.config.storageKey + 'name1') || this.preset.name1,
+                    name2: localStorage.getItem(this.config.storageKey + 'name2') || this.preset.name2,
+                    anniversary: localStorage.getItem(this.config.storageKey + 'anniversary') || this.preset.anniversary,
+                    homeImage: localStorage.getItem(this.config.storageKey + 'homeImage'),
+                    nextDate: localStorage.getItem(this.config.storageKey + 'nextDate')
+                },
+                photos: [],
+                moods: []
+            };
+            
+            // 导出照片
+            if (this.db) {
+                const photosTransaction = this.db.transaction(['photos'], 'readonly');
+                const photosStore = photosTransaction.objectStore('photos');
+                const photosRequest = photosStore.getAll();
+                
+                await new Promise((resolve) => {
+                    photosRequest.onsuccess = (event) => {
+                        data.photos = event.target.result;
+                        resolve();
+                    };
+                });
+                
+                // 导出心情
+                const moodsTransaction = this.db.transaction(['moods'], 'readonly');
+                const moodsStore = moodsTransaction.objectStore('moods');
+                const moodsRequest = moodsStore.getAll();
+                
+                await new Promise((resolve) => {
+                    moodsRequest.onsuccess = (event) => {
+                        data.moods = event.target.result;
+                        resolve();
+                    };
+                });
+            }
+            
+            // 生成文件名
+            const date = new Date().toISOString().split('T')[0];
+            const filename = `时光纽带-${date}.json`;
+            
+            // 创建下载链接
+            const json = JSON.stringify(data);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            this.showFeedback(`数据已导出！发送 ${filename} 给另一半即可同步`);
+        } catch (error) {
+            console.error('导出失败:', error);
+            this.showFeedback('导出失败，请重试');
+        }
+    }
+    
+    // 导入数据
+    async importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // 验证数据格式
+                if (!data.version || !data.config) {
+                    throw new Error('无效的数据文件');
+                }
+                
+                // 显示导入预览
+                const confirmMsg = `
+确认导入来自 ${data.exportBy || '未知'} 的数据？
+导出时间：${new Date(data.exportDate).toLocaleString('zh-CN')}
+包含：${data.photos.length} 张照片，${data.moods.length} 条心情
+
+注意：导入将合并数据，不会删除现有内容`;
+                
+                if (!confirm(confirmMsg)) return;
+                
+                // 导入配置（可选）
+                const importConfig = confirm('是否同时导入配置信息（姓名、纪念日等）？');
+                if (importConfig && data.config) {
+                    if (data.config.name1) localStorage.setItem(this.config.storageKey + 'name1', data.config.name1);
+                    if (data.config.name2) localStorage.setItem(this.config.storageKey + 'name2', data.config.name2);
+                    if (data.config.anniversary) localStorage.setItem(this.config.storageKey + 'anniversary', data.config.anniversary);
+                    if (data.config.homeImage) localStorage.setItem(this.config.storageKey + 'homeImage', data.config.homeImage);
+                    if (data.config.nextDate) localStorage.setItem(this.config.storageKey + 'nextDate', data.config.nextDate);
+                }
+                
+                // 导入照片和心情
+                let importedPhotos = 0;
+                let importedMoods = 0;
+                
+                if (this.db) {
+                    // 导入照片（避免重复）
+                    if (data.photos && data.photos.length > 0) {
+                        const photosTransaction = this.db.transaction(['photos'], 'readwrite');
+                        const photosStore = photosTransaction.objectStore('photos');
+                        
+                        for (let photo of data.photos) {
+                            try {
+                                await photosStore.add(photo);
+                                importedPhotos++;
+                            } catch (e) {
+                                // 忽略重复的照片
+                                console.log('跳过重复照片');
+                            }
+                        }
+                    }
+                    
+                    // 导入心情（避免重复）
+                    if (data.moods && data.moods.length > 0) {
+                        const moodsTransaction = this.db.transaction(['moods'], 'readwrite');
+                        const moodsStore = moodsTransaction.objectStore('moods');
+                        
+                        for (let mood of data.moods) {
+                            try {
+                                await moodsStore.add(mood);
+                                importedMoods++;
+                            } catch (e) {
+                                // 忽略重复的心情
+                                console.log('跳过重复心情');
+                            }
+                        }
+                    }
+                }
+                
+                this.showFeedback(`成功导入 ${importedPhotos} 张照片，${importedMoods} 条心情！`);
+                
+                // 刷新显示
+                setTimeout(() => {
+                    this.loadPhotos();
+                    this.loadMoods();
+                    if (importConfig) {
+                        location.reload();
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('导入失败:', error);
+                this.showFeedback('导入失败：' + error.message);
+            }
+        };
+        
+        input.click();
+    }
+    
+    // 检查URL中的共享数据
+    checkSharedData() {
+        // 预留功能：未来可通过URL参数快速共享配置
     }
     
     // 初始化滚动效果
