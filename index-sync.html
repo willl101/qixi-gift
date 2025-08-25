@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>时光纽带 - 实时同步版</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- 开场动画 -->
+    <div id="dawn" class="dawn-animation">
+        <div class="sun-rise"></div>
+        <div class="dawn-text">时光纽带</div>
+        <div class="dawn-subtitle">连接彼此的每一刻</div>
+    </div>
+
+    <!-- 密码验证 -->
+    <div id="authOverlay" class="auth-overlay hidden">
+        <div class="auth-modal">
+            <div class="auth-icon">💙</div>
+            <h2>输入我们的密码</h2>
+            <input type="password" id="passwordInput" placeholder="****" maxlength="4">
+            <button onclick="window.timeFlowInstance.checkPassword()">进入</button>
+            <div class="auth-hint">提示：我们的特殊数字</div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div id="contentFlow" class="content-flow">
+        
+        <!-- 第一部分：我们的小窝 -->
+        <section class="flow-section home-section">
+            <div class="section-inner">
+                <h1 class="couple-names">
+                    <span id="name1">段淦元</span> 
+                    <span class="heart-icon">💙</span> 
+                    <span id="name2">张琳曼</span>
+                </h1>
+                
+                <div class="anniversary-info">
+                    <span class="anniversary-label">在一起</span>
+                    <span id="daysCount" class="days-count">0</span>
+                    <span class="anniversary-label">天</span>
+                </div>
+                
+                <div class="home-photo-container">
+                    <h2 class="section-title">我们的小窝</h2>
+                    <div class="photo-upload-area" id="homePhotoArea">
+                        <img id="homeImg" class="home-img hidden" alt="Our Home">
+                        <div class="photo-hint">
+                            <span class="upload-icon">🏠</span>
+                            <span>点击上传小窝照片</span>
+                        </div>
+                        <input type="file" id="homePhotoInput" accept="image/*" hidden>
+                        <button id="homePhotoDelete" class="delete-btn hidden" onclick="window.timeFlowInstance.deleteHomePhoto()">删除</button>
+                    </div>
+                </div>
+
+                <div class="next-meeting">
+                    <h3 class="meeting-title">下次见面</h3>
+                    <div class="countdown-display">
+                        <span id="countDays" class="count-number">?</span>
+                        <span class="count-label">天后</span>
+                    </div>
+                    <input type="date" id="nextDateInput" class="date-picker">
+                    <p id="meetingMessage" class="meeting-message">选个日期，开始期待</p>
+                </div>
+                
+                <div class="daily-tip">
+                    <p id="tipContent">每一天都值得被珍惜</p>
+                </div>
+                
+                <button class="hug-btn" onclick="window.timeFlowInstance.sendHug()">
+                    <span class="hug-icon">🤗</span>
+                    发送拥抱
+                </button>
+                <div id="hugWave" class="hug-wave hidden"></div>
+            </div>
+        </section>
+
+        <!-- 第二部分：照片流 -->
+        <section class="flow-section photos-section">
+            <div class="section-inner">
+                <div class="section-header">
+                    <h2 class="section-title">我们的时光</h2>
+                    <button class="add-photos-btn" onclick="document.getElementById('photoInput').click()">
+                        <span>+</span> 添加照片
+                    </button>
+                </div>
+                <input type="file" id="photoInput" multiple accept="image/*" hidden>
+                
+                <div id="photoStream" class="photo-stream">
+                    <!-- 照片将动态加载到这里 -->
+                </div>
+                
+                <div class="storage-info">
+                    <span id="storageUsed">已使用: 0 MB</span>
+                    <div class="sync-status" id="syncStatus">
+                        <span class="sync-icon">🔄</span>
+                        <span id="syncText">实时同步中</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三部分：心情记录 -->
+        <section class="flow-section mood-section">
+            <div class="section-inner">
+                <h2 class="section-title">此刻想说</h2>
+                
+                <div class="mood-input-area">
+                    <div class="mood-buttons">
+                        <button class="mood-btn" data-mood="happy">😊</button>
+                        <button class="mood-btn" data-mood="love">💙</button>
+                        <button class="mood-btn" data-mood="miss">🌙</button>
+                        <button class="mood-btn" data-mood="tired">😔</button>
+                        <button class="mood-btn" data-mood="excited">🎉</button>
+                        <button class="mood-btn" data-mood="grateful">🙏</button>
+                        <button class="mood-btn" data-mood="peaceful">☁️</button>
+                        <button class="mood-btn" data-mood="hopeful">⭐</button>
+                    </div>
+                    
+                    <textarea id="moodText" placeholder="写下此刻的心情..." maxlength="200"></textarea>
+                    
+                    <div class="mood-actions">
+                        <input type="file" id="moodPhotoInput" accept="image/*" hidden>
+                        <button class="attach-photo-btn" onclick="document.getElementById('moodPhotoInput').click()">
+                            📷 配图
+                        </button>
+                        <button class="send-mood-btn" onclick="window.timeFlowInstance.sendMood()">
+                            发送心情
+                        </button>
+                    </div>
+                    
+                    <img id="moodPhotoPreview" class="mood-photo-preview hidden">
+                </div>
+                
+                <div id="moodTimeline" class="mood-timeline">
+                    <!-- 心情记录将动态加载到这里 -->
+                </div>
+                
+                <div id="moodRipples" class="mood-ripples"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 设置按钮 -->
+    <button class="settings-btn" onclick="window.timeFlowInstance.openSettings()">⚙️</button>
+
+    <!-- 设置弹窗 -->
+    <div id="settingsModal" class="settings-modal hidden">
+        <div class="settings-content">
+            <h2>个性化设置</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label>你的名字</label>
+                    <input type="text" id="settingsName1" placeholder="输入你的名字">
+                </div>
+                <div class="form-group">
+                    <label>TA的名字</label>
+                    <input type="text" id="settingsName2" placeholder="输入TA的名字">
+                </div>
+                <div class="form-group">
+                    <label>纪念日</label>
+                    <input type="date" id="settingsAnniversary">
+                </div>
+                <div class="form-group">
+                    <label>房间代码（用于同步）</label>
+                    <input type="text" id="roomCode" placeholder="输入6位房间代码" maxlength="6">
+                    <small>设置相同的房间代码即可实时同步数据</small>
+                </div>
+            </div>
+            <div class="settings-actions">
+                <button onclick="window.timeFlowInstance.saveSettings()">保存</button>
+                <button onclick="window.timeFlowInstance.closeSettings()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 照片查看器 -->
+    <div id="photoViewer" class="photo-viewer hidden">
+        <span class="close-viewer" onclick="document.getElementById('photoViewer').classList.add('hidden')">×</span>
+        <img id="viewerImg" alt="查看照片">
+    </div>
+
+    <script src="app-sync.js"></script>
+</body>
+</html>

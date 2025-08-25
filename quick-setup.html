@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速设置 Firebase - 时光纽带</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+        }
+        .step {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4A90E2;
+        }
+        .step h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        textarea {
+            min-height: 150px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        .code-block {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        a {
+            color: #4A90E2;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 5分钟快速设置实时同步</h1>
+        
+        <div class="step">
+            <h2>步骤 1：创建免费 Firebase 项目</h2>
+            <p>1. 点击下面的按钮，会自动打开 Firebase 并创建项目：</p>
+            <button onclick="window.open('https://console.firebase.google.com/u/0/project/_/database/create?hl=zh-cn', '_blank')">
+                打开 Firebase Console
+            </button>
+            <p>2. 如果没有账号，使用 Google 账号登录</p>
+            <p>3. 点击"创建项目"，输入项目名称（如：love-link）</p>
+            <p>4. 关闭 Google Analytics（不需要）</p>
+            <p>5. 等待项目创建完成</p>
+        </div>
+
+        <div class="step">
+            <h2>步骤 2：启用数据库和存储</h2>
+            <p>项目创建后：</p>
+            <ol>
+                <li>点击左侧菜单的 <strong>Realtime Database</strong></li>
+                <li>点击"创建数据库"</li>
+                <li>选择地区（建议选 Singapore）</li>
+                <li>选择"以测试模式启动"</li>
+                <li>点击"启用"</li>
+            </ol>
+            <p>然后：</p>
+            <ol>
+                <li>点击左侧菜单的 <strong>Storage</strong></li>
+                <li>点击"开始使用"</li>
+                <li>选择"以测试模式启动"</li>
+                <li>点击"完成"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h2>步骤 3：获取配置代码</h2>
+            <p>1. 在 Firebase Console 中，点击项目设置（齿轮图标）</p>
+            <p>2. 向下滚动到"您的应用"部分</p>
+            <p>3. 点击 Web 图标 <strong>&lt;/&gt;</strong></p>
+            <p>4. 输入应用名称（如：love-link-web）</p>
+            <p>5. 点击"注册应用"</p>
+            <p>6. 复制显示的 firebaseConfig 对象，粘贴到下面：</p>
+            
+            <textarea id="configInput" placeholder="粘贴你的 firebaseConfig = { ... } 代码"></textarea>
+            
+            <button onclick="processConfig()">生成配置文件</button>
+        </div>
+
+        <div class="step" id="step4" style="display: none;">
+            <h2>步骤 4：下载配置文件</h2>
+            <p>配置已生成！请下载下面的文件：</p>
+            
+            <button onclick="downloadConfig()">下载 firebase-config.js</button>
+            <button onclick="downloadHTML()">下载 index-realtime.html</button>
+            
+            <div class="success" id="successMsg">
+                ✅ 配置成功！将这两个文件放到项目目录，然后访问 index-realtime.html 即可使用实时同步功能！
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>使用说明</h2>
+            <ul>
+                <li>📱 两个人访问同一个网址即可实时同步</li>
+                <li>🔐 首次使用设置相同的6位房间代码</li>
+                <li>📷 上传的照片会立即在对方设备显示</li>
+                <li>💬 发送的心情会实时同步</li>
+                <li>🆓 完全免费，Firebase 免费额度足够使用</li>
+            </ul>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+    <script>
+        let firebaseConfig = null;
+
+        function processConfig() {
+            const input = document.getElementById('configInput').value;
+            
+            try {
+                // 提取 firebaseConfig 对象
+                const match = input.match(/(?:const\s+)?firebaseConfig\s*=\s*({[\s\S]*?});?/);
+                if (!match) {
+                    throw new Error('未找到 firebaseConfig 对象，请确保粘贴完整的配置代码');
+                }
+                
+                // 解析配置
+                eval('firebaseConfig = ' + match[1]);
+                
+                // 验证必要字段
+                if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+                    throw new Error('配置不完整，请确保包含所有必要字段');
+                }
+                
+                // 显示成功信息
+                document.getElementById('step4').style.display = 'block';
+                document.getElementById('successMsg').style.display = 'block';
+                
+                // 滚动到底部
+                document.getElementById('step4').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = '❌ 错误：' + error.message;
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        function downloadConfig() {
+            if (!firebaseConfig) return;
+            
+            const configContent = `// Firebase 配置文件 - 自动生成
+// 生成时间：${new Date().toLocaleString('zh-CN')}
+
+const firebaseConfig = ${JSON.stringify(firebaseConfig, null, 2)};
+
+// 初始化 Firebase
+if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    console.log('Firebase 初始化成功！');
+}
+`;
+            
+            downloadFile('firebase-config.js', configContent);
+        }
+
+        function downloadHTML() {
+            if (!firebaseConfig) return;
+            
+            const htmlContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光纽带 - 实时同步版</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"><\/script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"><\/script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"><\/script>
+    
+    <!-- Firebase 配置 -->
+    <script>
+        const firebaseConfig = ${JSON.stringify(firebaseConfig, null, 8)};
+        firebase.initializeApp(firebaseConfig);
+    <\/script>
+</head>
+<body>
+    <!-- 复制 index-sync.html 的 body 内容 -->
+    ${document.querySelector('body').innerHTML}
+    
+    <!-- 加载同步脚本 -->
+    <script src="app-sync.js"><\/script>
+</body>
+</html>`;
+            
+            downloadFile('index-realtime.html', htmlContent);
+        }
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
