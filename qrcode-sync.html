@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>时光纽带 - 扫码访问</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .qr-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .qr-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .qr-container {
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 10px;
+        }
+        .url-display {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            word-break: break-all;
+            color: #666;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .feature-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 5px;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .room-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6b9d;
+            text-align: center;
+            padding: 20px;
+            background: #ffeef3;
+            border-radius: 15px;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+        .tips {
+            background: #e7f3ff;
+            color: #004085;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 扫码访问时光纽带</h1>
+        
+        <div class="success">
+            ✅ 服务器运行中 | 端口：8082 | IP：192.168.9.192
+        </div>
+        
+        <!-- 实时同步版二维码 -->
+        <div class="qr-section">
+            <div class="qr-title">
+                🌟 实时同步版（推荐）
+                <div>
+                    <span class="feature-badge">云端存储</span>
+                    <span class="feature-badge">实时同步</span>
+                </div>
+            </div>
+            <div class="qr-container">
+                <div id="qrcode-sync"></div>
+            </div>
+            <div class="url-display" id="url-sync"></div>
+        </div>
+        
+        <!-- 普通版二维码 -->
+        <div class="qr-section">
+            <div class="qr-title">
+                📱 普通版（本地存储）
+                <div>
+                    <span class="feature-badge" style="background: #ffc107;">仅本地</span>
+                </div>
+            </div>
+            <div class="qr-container">
+                <div id="qrcode-local"></div>
+            </div>
+            <div class="url-display" id="url-local"></div>
+        </div>
+        
+        <!-- 房间代码显示 -->
+        <div class="room-code" id="roomCodeDisplay">
+            <div style="font-size: 14px; color: #999; margin-bottom: 10px;">房间代码</div>
+            <span id="roomCode">生成中...</span>
+        </div>
+        
+        <div class="tips">
+            <strong>📝 使用说明：</strong><br>
+            1. 两个设备扫描<strong>实时同步版</strong>的二维码<br>
+            2. 输入密码：<strong>1314</strong><br>
+            3. 确保两个设备使用<strong>相同的房间代码</strong><br>
+            4. 现在照片和心情会实时同步！
+        </div>
+        
+        <div class="warning">
+            ⚠️ 注意：两个设备必须在同一WiFi网络下才能访问此地址
+        </div>
+        
+        <div class="button-group">
+            <button onclick="window.open('test-firebase.html', '_blank')">测试Firebase</button>
+            <button onclick="window.open('which-version.html', '_blank')">版本说明</button>
+            <button onclick="copyRoomCode()">复制房间代码</button>
+        </div>
+    </div>
+    
+    <script>
+        // 获取当前网络地址
+        const baseUrl = 'http://192.168.9.192:8082';
+        
+        // 实时同步版URL
+        const syncUrl = baseUrl + '/index-sync.html';
+        document.getElementById('url-sync').textContent = syncUrl;
+        
+        // 普通版URL
+        const localUrl = baseUrl + '/index.html';
+        document.getElementById('url-local').textContent = localUrl;
+        
+        // 生成实时同步版二维码
+        new QRCode(document.getElementById("qrcode-sync"), {
+            text: syncUrl,
+            width: 200,
+            height: 200,
+            colorDark : "#667eea",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        
+        // 生成普通版二维码
+        new QRCode(document.getElementById("qrcode-local"), {
+            text: localUrl,
+            width: 200,
+            height: 200,
+            colorDark : "#ffc107",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        
+        // 获取或生成房间代码
+        let roomCode = localStorage.getItem('timeFlow_roomCode');
+        if (!roomCode) {
+            roomCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+            localStorage.setItem('timeFlow_roomCode', roomCode);
+        }
+        document.getElementById('roomCode').textContent = roomCode;
+        
+        // 复制房间代码
+        function copyRoomCode() {
+            const code = document.getElementById('roomCode').textContent;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('房间代码已复制：' + code);
+                });
+            } else {
+                const input = document.createElement('input');
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                alert('房间代码已复制：' + code);
+            }
+        }
+        
+        // 显示提示
+        console.log('%c时光纽带 - 实时同步版', 'color: #667eea; font-size: 20px; font-weight: bold;');
+        console.log('同步版URL:', syncUrl);
+        console.log('房间代码:', roomCode);
+    </script>
+</body>
+</html>
