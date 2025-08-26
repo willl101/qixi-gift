@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>时光纽带</title>
+    
+    <!-- 嵌入样式 -->
+    <style id="embeddedStyles">
+        /* 从styles.css中复制的核心样式 - 会动态更新 */
+    </style>
+    
+    <!-- 内联基础样式 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* 嵌入照片容器 */
+        .embedded-photos {
+            display: none;
+        }
+        
+        /* 保存按钮 */
+        .save-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .save-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(40, 167, 69, 0.5);
+        }
+        
+        .save-button:active {
+            transform: scale(0.95);
+        }
+        
+        .save-icon {
+            font-size: 20px;
+        }
+        
+        /* 提示信息 */
+        .save-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .save-toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- 原始HTML内容 - 从index.html复制 -->
+    <div id="originalContent">
+        <!-- 这里会动态加载原始内容 -->
+    </div>
+    
+    <!-- 嵌入的照片数据存储 -->
+    <div class="embedded-photos" id="embeddedPhotos">
+        <!-- 照片将以base64形式存储在这里 -->
+    </div>
+    
+    <!-- 嵌入的心情数据存储 -->
+    <div class="embedded-moods" id="embeddedMoods" style="display: none;">
+        <!-- 心情数据将以JSON形式存储在这里 -->
+    </div>
+    
+    <!-- 嵌入的配置数据 -->
+    <div class="embedded-config" id="embeddedConfig" style="display: none;">
+        <!-- 配置数据将存储在这里 -->
+    </div>
+    
+    <!-- 保存按钮 -->
+    <button class="save-button" id="saveButton" onclick="saveAsHTML()">
+        <span class="save-icon">💾</span>
+        <span>保存页面</span>
+    </button>
+    
+    <!-- 提示信息 -->
+    <div class="save-toast" id="saveToast"></div>
+    
+    <!-- 核心脚本 -->
+    <script>
+        // 全局存储
+        const embeddedData = {
+            photos: [],
+            moods: [],
+            config: {
+                name1: '段淦元',
+                name2: '张琳曼',
+                anniversary: '2024-04-13',
+                password: '1314'
+            },
+            styles: '',
+            originalHTML: ''
+        };
+        
+        // 初始化
+        async function initStandalone() {
+            // 加载原始页面内容
+            await loadOriginalContent();
+            
+            // 初始化嵌入数据
+            loadEmbeddedData();
+            
+            // 修改原有功能以保存到HTML
+            overrideOriginalFunctions();
+            
+            // 自动加载样式
+            await loadStyles();
+        }
+        
+        // 加载原始内容
+        async function loadOriginalContent() {
+            try {
+                // 如果有嵌入的HTML，使用它
+                const embeddedHTML = document.getElementById('embeddedHTML');
+                if (embeddedHTML && embeddedHTML.innerHTML.trim()) {
+                    document.getElementById('originalContent').innerHTML = embeddedHTML.innerHTML;
+                    return;
+                }
+                
+                // 否则加载原始index.html
+                const response = await fetch('index.html');
+                const html = await response.text();
+                
+                // 提取body内容
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const bodyContent = doc.body.innerHTML;
+                
+                // 移除script标签（我们会用自己的）
+                const cleanContent = bodyContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                
+                document.getElementById('originalContent').innerHTML = cleanContent;
+                embeddedData.originalHTML = cleanContent;
+                
+            } catch (error) {
+                console.error('加载原始内容失败:', error);
+                // 使用基础模板
+                document.getElementById('originalContent').innerHTML = getBasicTemplate();
+            }
+        }
+        
+        // 加载样式
+        async function loadStyles() {
+            try {
+                // 如果有嵌入的样式，使用它
+                const embeddedStylesElement = document.getElementById('embeddedStyles');
+                if (embeddedStylesElement && embeddedStylesElement.innerHTML.trim()) {
+                    return;
+                }
+                
+                // 否则加载styles.css
+                const response = await fetch('styles.css');
+                const styles = await response.text();
+                
+                embeddedStylesElement.innerHTML = styles;
+                embeddedData.styles = styles;
+                
+            } catch (error) {
+                console.error('加载样式失败:', error);
+                // 使用基础样式
+                document.getElementById('embeddedStyles').innerHTML = getBasicStyles();
+            }
+        }
+        
+        // 加载嵌入的数据
+        function loadEmbeddedData() {
+            // 加载照片
+            const photosContainer = document.getElementById('embeddedPhotos');
+            const photoElements = photosContainer.querySelectorAll('img');
+            photoElements.forEach(img => {
+                embeddedData.photos.push({
+                    data: img.src,
+                    name: img.dataset.name || 'photo',
+                    date: img.dataset.date || new Date().toISOString()
+                });
+            });
+            
+            // 加载心情
+            const moodsContainer = document.getElementById('embeddedMoods');
+            if (moodsContainer.textContent) {
+                try {
+                    embeddedData.moods = JSON.parse(moodsContainer.textContent);
+                } catch (e) {
+                    embeddedData.moods = [];
+                }
+            }
+            
+            // 加载配置
+            const configContainer = document.getElementById('embeddedConfig');
+            if (configContainer.textContent) {
+                try {
+                    embeddedData.config = JSON.parse(configContainer.textContent);
+                } catch (e) {
+                    // 使用默认配置
+                }
+            }
+            
+            // 显示已加载的照片
+            displayPhotos();
+            displayMoods();
+            applyConfig();
+        }
+        
+        // 覆盖原有功能
+        function overrideOriginalFunctions() {
+            // 等待原始脚本加载后覆盖
+            setTimeout(() => {
+                // 覆盖照片上传功能
+                if (window.timeFlowInstance) {
+                    const originalHandlePhotos = window.timeFlowInstance.handlePhotos;
+                    window.timeFlowInstance.handlePhotos = async function(e) {
+                        const files = Array.from(e.target.files);
+                        
+                        for (let file of files) {
+                            // 转换为base64
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const photoData = {
+                                    data: e.target.result,
+                                    name: file.name,
+                                    date: new Date().toISOString()
+                                };
+                                
+                                // 添加到嵌入数据
+                                embeddedData.photos.push(photoData);
+                                
+                                // 显示照片
+                                displayPhotos();
+                                
+                                // 显示提示
+                                showToast('照片已添加，记得保存页面！');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                    
+                    // 覆盖心情发送功能
+                    const originalSendMood = window.timeFlowInstance.sendMood;
+                    window.timeFlowInstance.sendMood = function() {
+                        const text = document.getElementById('moodText')?.value;
+                        if (text) {
+                            const mood = {
+                                text: text,
+                                emoji: window.timeFlowInstance.currentMood || '💭',
+                                date: new Date().toISOString(),
+                                author: embeddedData.config.name1
+                            };
+                            
+                            embeddedData.moods.push(mood);
+                            displayMoods();
+                            
+                            // 清空输入
+                            document.getElementById('moodText').value = '';
+                            
+                            showToast('心情已记录，记得保存页面！');
+                        }
+                    };
+                }
+            }, 2000);
+        }
+        
+        // 显示照片
+        function displayPhotos() {
+            const photoStream = document.getElementById('photoStream');
+            if (!photoStream) return;
+            
+            photoStream.innerHTML = '';
+            
+            embeddedData.photos.forEach((photo, index) => {
+                const item = document.createElement('div');
+                item.className = 'photo-item';
+                item.innerHTML = `
+                    <img src="${photo.data}" alt="${photo.name}">
+                    <button class="delete-photo" onclick="deleteEmbeddedPhoto(${index})">&times;</button>
+                `;
+                photoStream.appendChild(item);
+            });
+        }
+        
+        // 显示心情
+        function displayMoods() {
+            const moodTimeline = document.getElementById('moodTimeline');
+            if (!moodTimeline) return;
+            
+            moodTimeline.innerHTML = '';
+            
+            embeddedData.moods.forEach(mood => {
+                const item = document.createElement('div');
+                item.className = 'mood-item';
+                item.innerHTML = `
+                    <div class="mood-header">
+                        <span class="mood-emoji">${mood.emoji}</span>
+                        <span class="mood-author">${mood.author}</span>
+                        <span class="mood-time">${new Date(mood.date).toLocaleDateString()}</span>
+                    </div>
+                    <div class="mood-content">${mood.text}</div>
+                `;
+                moodTimeline.appendChild(item);
+            });
+        }
+        
+        // 应用配置
+        function applyConfig() {
+            // 更新名字
+            const name1El = document.getElementById('name1');
+            const name2El = document.getElementById('name2');
+            if (name1El) name1El.textContent = embeddedData.config.name1;
+            if (name2El) name2El.textContent = embeddedData.config.name2;
+            
+            // 更新天数
+            const anniversary = new Date(embeddedData.config.anniversary);
+            const now = new Date();
+            const days = Math.floor((now - anniversary) / (1000 * 60 * 60 * 24));
+            
+            const dayCountEl = document.getElementById('dayCount');
+            if (dayCountEl) dayCountEl.textContent = days;
+        }
+        
+        // 删除照片
+        function deleteEmbeddedPhoto(index) {
+            embeddedData.photos.splice(index, 1);
+            displayPhotos();
+            showToast('照片已删除');
+        }
+        
+        // 保存为HTML文件
+        function saveAsHTML() {
+            // 创建一个新的HTML文档
+            const htmlContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>时光纽带 - ${embeddedData.config.name1} ❤️ ${embeddedData.config.name2}</title>
+    <style id="embeddedStyles">
+${embeddedData.styles || document.getElementById('embeddedStyles').innerHTML}
+    </style>
+    <style>
+${document.querySelector('style:not(#embeddedStyles)').innerHTML}
+    </style>
+</head>
+<body>
+    <!-- 原始内容 -->
+    <div id="originalContent">
+${document.getElementById('originalContent').innerHTML}
+    </div>
+    
+    <!-- 嵌入的照片 -->
+    <div class="embedded-photos" id="embeddedPhotos" style="display: none;">
+${embeddedData.photos.map(photo => 
+    `        <img src="${photo.data}" data-name="${photo.name}" data-date="${photo.date}">`
+).join('\n')}
+    </div>
+    
+    <!-- 嵌入的心情 -->
+    <div class="embedded-moods" id="embeddedMoods" style="display: none;">
+${JSON.stringify(embeddedData.moods)}
+    </div>
+    
+    <!-- 嵌入的配置 -->
+    <div class="embedded-config" id="embeddedConfig" style="display: none;">
+${JSON.stringify(embeddedData.config)}
+    </div>
+    
+    <!-- 嵌入的HTML模板 -->
+    <div id="embeddedHTML" style="display: none;">
+${embeddedData.originalHTML}
+    </div>
+    
+    <!-- 保存按钮 -->
+    <button class="save-button" onclick="saveAsHTML()">
+        <span class="save-icon">💾</span>
+        <span>保存页面</span>
+    </button>
+    
+    <div class="save-toast" id="saveToast"></div>
+    
+    <script>
+${document.querySelector('script').innerHTML}
+    </script>
+    
+    <!-- 加载原始app.js -->
+    <script src="app.js"></script>
+    
+    <script>
+        // 自动初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initStandalone();
+        });
+    </script>
+</body>
+</html>`;
+            
+            // 创建下载
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // 生成文件名
+            const date = new Date().toISOString().split('T')[0];
+            a.download = `时光纽带_${embeddedData.config.name1}_${embeddedData.config.name2}_${date}.html`;
+            
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('页面已保存！发送这个HTML文件即可查看所有内容');
+        }
+        
+        // 显示提示
+        function showToast(message) {
+            const toast = document.getElementById('saveToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 获取基础模板
+        function getBasicTemplate() {
+            return `
+                <div class="container" style="padding: 20px; text-align: center;">
+                    <h1>时光纽带</h1>
+                    <div id="photoStream" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;"></div>
+                    <div id="moodTimeline" style="margin: 20px 0;"></div>
+                    <input type="file" id="photoInput" accept="image/*" multiple style="margin: 20px;">
+                </div>
+            `;
+        }
+        
+        // 获取基础样式
+        function getBasicStyles() {
+            return `
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 20px;
+                    padding: 30px;
+                }
+                .photo-item {
+                    position: relative;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                .photo-item img {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+                .delete-photo {
+                    position: absolute;
+                    top: 5px;
+                    right: 5px;
+                    background: rgba(255,255,255,0.9);
+                    border: none;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 20px;
+                    color: #ff4444;
+                }
+            `;
+        }
+        
+        // 启动
+        document.addEventListener('DOMContentLoaded', () => {
+            initStandalone();
+        });
+    </script>
+    
+    <!-- 加载原始app.js（如果存在） -->
+    <script src="app.js"></script>
+</body>
+</html>
