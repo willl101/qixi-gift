@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>时光纽带 💕</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Firebase 配置 -->
+    <script src="firebase-config.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 加载屏幕 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-heart {
+            font-size: 60px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.3); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.3); }
+            70% { transform: scale(1); }
+        }
+        
+        .loading-text {
+            color: white;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        /* 密码验证 */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .auth-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .auth-modal {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .auth-modal h2 {
+            color: #333;
+            margin: 20px 0;
+            font-size: 20px;
+        }
+        
+        .auth-modal input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 20px;
+            text-align: center;
+            letter-spacing: 10px;
+            margin: 20px 0;
+            transition: border-color 0.3s;
+        }
+        
+        .auth-modal input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .auth-modal button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .auth-modal button:active {
+            transform: scale(0.95);
+        }
+        
+        /* 主容器 */
+        .app-container {
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            padding: env(safe-area-inset-top) 15px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .couple-names {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .heart-icon {
+            color: #ff6b9d;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #4CAF50;
+        }
+        
+        .sync-icon {
+            animation: rotate 2s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 内容区域 */
+        .content {
+            padding-top: calc(60px + env(safe-area-inset-top));
+            padding-bottom: calc(70px + env(safe-area-inset-bottom));
+        }
+        
+        /* 信息卡片 */
+        .info-card {
+            background: white;
+            margin: 15px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .anniversary-section {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .days-together {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .days-label {
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        /* 快捷功能 */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px;
+        }
+        
+        .action-btn {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-icon {
+            font-size: 32px;
+        }
+        
+        .action-text {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        /* 照片流 */
+        .photo-section {
+            margin: 15px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .add-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .photo-item {
+            position: relative;
+            padding-bottom: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .photo-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff4444;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .photo-item:hover .photo-delete {
+            opacity: 1;
+        }
+        
+        /* 心情输入 */
+        .mood-section {
+            margin: 15px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+        }
+        
+        .mood-emojis {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .mood-emoji {
+            font-size: 28px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .mood-emoji.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scale(1.1);
+        }
+        
+        .mood-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            resize: none;
+            min-height: 80px;
+            margin-bottom: 15px;
+        }
+        
+        .mood-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .mood-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .mood-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .send-mood {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .add-photo {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        /* 心情列表 */
+        .mood-list {
+            margin: 15px;
+        }
+        
+        .mood-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .mood-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .mood-avatar {
+            font-size: 24px;
+        }
+        
+        .mood-author {
+            font-weight: bold;
+            color: #ff6b9d;
+        }
+        
+        .mood-time {
+            color: #999;
+            font-size: 12px;
+            margin-left: auto;
+        }
+        
+        .mood-content {
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .mood-photo {
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 0 env(safe-area-inset-bottom);
+            z-index: 100;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        /* 悬浮按钮 */
+        .float-btn {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d 0%, #feca57 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+            cursor: pointer;
+            z-index: 99;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .float-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .hug-wave {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 107, 157, 0.3);
+            z-index: 98;
+            pointer-events: none;
+            animation: wave 2s ease-out;
+        }
+        
+        @keyframes wave {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: scale(5);
+                opacity: 0;
+            }
+        }
+        
+        /* 设置弹窗 */
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9997;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 20px;
+        }
+        
+        .settings-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .settings-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .settings-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .room-code-display {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .room-code-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 3px;
+        }
+        
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .settings-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .cancel-btn {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        /* 图片查看器 */
+        .image-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9996;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .image-viewer.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .viewer-img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+        
+        .viewer-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 反馈提示 */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 隐藏文件输入 */
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载屏幕 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-heart">💕</div>
+        <div class="loading-text">时光纽带</div>
+    </div>
+    
+    <!-- 密码验证 -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal">
+            <div style="font-size: 60px; margin-bottom: 20px;">💙</div>
+            <h2>输入我们的密码</h2>
+            <input type="tel" id="passwordInput" placeholder="****" maxlength="4">
+            <button onclick="app.checkPassword()">进入</button>
+        </div>
+    </div>
+    
+    <!-- 主应用 -->
+    <div class="app-container">
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <div class="couple-names">
+                <span id="name1">你</span>
+                <span class="heart-icon">❤️</span>
+                <span id="name2">TA</span>
+            </div>
+            <div class="sync-status">
+                <span class="sync-icon">🔄</span>
+                <span id="syncText">同步中</span>
+            </div>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="content">
+            <!-- 纪念日 -->
+            <div class="info-card anniversary-section">
+                <div class="days-together" id="daysCount">0</div>
+                <div class="days-label">在一起的天数</div>
+            </div>
+            
+            <!-- 快捷功能 -->
+            <div class="quick-actions">
+                <button class="action-btn" onclick="document.getElementById('photoInput').click()">
+                    <span class="action-icon">📷</span>
+                    <span class="action-text">上传照片</span>
+                </button>
+                <button class="action-btn" onclick="app.showMoodInput()">
+                    <span class="action-icon">💭</span>
+                    <span class="action-text">记录心情</span>
+                </button>
+                <button class="action-btn" onclick="app.showCountdown()">
+                    <span class="action-icon">📅</span>
+                    <span class="action-text">见面倒计时</span>
+                </button>
+                <button class="action-btn" onclick="app.showSettings()">
+                    <span class="action-icon">⚙️</span>
+                    <span class="action-text">设置</span>
+                </button>
+            </div>
+            
+            <!-- 照片流 -->
+            <div class="photo-section">
+                <div class="section-header">
+                    <div class="section-title">我们的照片</div>
+                    <button class="add-btn" onclick="document.getElementById('photoInput').click()">
+                        + 添加
+                    </button>
+                </div>
+                <div class="photo-grid" id="photoGrid">
+                    <!-- 照片动态加载 -->
+                </div>
+            </div>
+            
+            <!-- 心情输入 -->
+            <div class="mood-section" id="moodSection" style="display: none;">
+                <div class="mood-emojis">
+                    <span class="mood-emoji" data-emoji="😊" onclick="app.selectEmoji(this)">😊</span>
+                    <span class="mood-emoji" data-emoji="💙" onclick="app.selectEmoji(this)">💙</span>
+                    <span class="mood-emoji" data-emoji="🌙" onclick="app.selectEmoji(this)">🌙</span>
+                    <span class="mood-emoji" data-emoji="😔" onclick="app.selectEmoji(this)">😔</span>
+                    <span class="mood-emoji" data-emoji="🎉" onclick="app.selectEmoji(this)">🎉</span>
+                    <span class="mood-emoji" data-emoji="🙏" onclick="app.selectEmoji(this)">🙏</span>
+                </div>
+                <textarea class="mood-input" id="moodInput" placeholder="此刻想对TA说..."></textarea>
+                <div class="mood-actions">
+                    <button class="mood-btn send-mood" onclick="app.sendMood()">发送</button>
+                    <button class="mood-btn add-photo" onclick="document.getElementById('moodPhotoInput').click()">
+                        📷 配图
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 心情列表 -->
+            <div class="mood-list" id="moodList">
+                <!-- 心情动态加载 -->
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="app.switchTab('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">首页</span>
+            </button>
+            <button class="nav-item" onclick="app.switchTab('photos')">
+                <span class="nav-icon">📷</span>
+                <span class="nav-text">照片</span>
+            </button>
+            <button class="nav-item" onclick="app.switchTab('moods')">
+                <span class="nav-icon">💭</span>
+                <span class="nav-text">心情</span>
+            </button>
+            <button class="nav-item" onclick="app.switchTab('settings')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-text">我们</span>
+            </button>
+        </div>
+        
+        <!-- 悬浮拥抱按钮 -->
+        <button class="float-btn" onclick="app.sendHug()">🤗</button>
+        
+        <!-- 设置弹窗 -->
+        <div class="settings-modal" id="settingsModal">
+            <div class="settings-content">
+                <div class="settings-title">个性化设置</div>
+                
+                <div class="form-group">
+                    <label class="form-label">你的名字</label>
+                    <input type="text" class="form-input" id="settingName1" placeholder="输入你的名字">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">TA的名字</label>
+                    <input type="text" class="form-input" id="settingName2" placeholder="输入TA的名字">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">纪念日</label>
+                    <input type="date" class="form-input" id="settingAnniversary">
+                </div>
+                
+                <div class="room-code-display">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 10px;">房间代码</div>
+                    <div class="room-code-value" id="roomCodeValue">------</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        两个设备使用相同代码即可同步
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">更改房间代码</label>
+                    <input type="text" class="form-input" id="settingRoomCode" 
+                           placeholder="输入6位代码" maxlength="6" style="text-transform: uppercase;">
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="settings-btn save-btn" onclick="app.saveSettings()">保存</button>
+                    <button class="settings-btn cancel-btn" onclick="app.closeSettings()">取消</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图片查看器 -->
+        <div class="image-viewer" id="imageViewer">
+            <span class="viewer-close" onclick="app.closeViewer()">&times;</span>
+            <img class="viewer-img" id="viewerImg" alt="查看图片">
+        </div>
+        
+        <!-- Toast提示 -->
+        <div class="toast" id="toast"></div>
+        
+        <!-- 文件输入 -->
+        <input type="file" id="photoInput" accept="image/*" multiple onchange="app.handlePhotos(event)">
+        <input type="file" id="moodPhotoInput" accept="image/*" onchange="app.handleMoodPhoto(event)">
+    </div>
+    
+    <script src="app-h5.js"></script>
+</body>
+</html>
