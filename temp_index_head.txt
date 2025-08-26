@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>时光纽带</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 开场 - 晨光初现 -->
+    <div id="dawn" class="dawn-screen">
+        <div class="dawn-gradient"></div>
+        <div class="dawn-content">
+            <div class="dawn-sun"></div>
+            <h1 class="dawn-title">时光纽带</h1>
+            <div class="dawn-shimmer"></div>
+        </div>
+    </div>
+
+    <!-- 认证 - 轻柔入口 -->
+    <div id="auth" class="auth-flow hidden">
+        <div class="auth-mist"></div>
+        <div class="auth-portal">
+            <div class="portal-glow"></div>
+            <input type="tel" id="authCode" class="auth-input" 
+                   placeholder="····" maxlength="4" 
+                   pattern="[0-9]*" inputmode="numeric">
+            <div class="auth-hint">Enter the magic number</div>
+        </div>
+    </div>
+
+    <!-- 时光河流 - 无尽流淌 -->
+    <div id="timeRiver" class="time-river hidden">
+        <!-- 天空渐变层 - 从晨曦到日落 -->
+        <div class="sky-gradient">
+            <div class="sky-layer dawn-sky"></div>
+            <div class="sky-layer morning-sky"></div>
+            <div class="sky-layer noon-sky"></div>
+            <div class="sky-layer sunset-sky"></div>
+        </div>
+
+        <!-- 光晕流动 -->
+        <div class="light-streams">
+            <div class="light-stream stream-1"></div>
+            <div class="light-stream stream-2"></div>
+            <div class="light-stream stream-3"></div>
+        </div>
+
+        <!-- 浮动时间标记 -->
+        <div class="time-marker">
+            <div class="marker-names">
+                <span id="name1">段淦元</span>
+                <span class="marker-heart">♡</span>
+                <span id="name2">张琳曼</span>
+            </div>
+            <div class="marker-days">
+                <span id="dayCount">0</span>
+                <span class="days-label">Days Together</span>
+            </div>
+        </div>
+
+        <!-- 时光内容流 - 垂直连续 -->
+        <div class="content-flow" id="contentFlow">
+            <!-- 起源 - 故事开始 -->
+            <section class="flow-section origin-section">
+                <div class="section-aura"></div>
+                <div class="origin-content">
+                    <div class="origin-ring">
+                        <div class="ring-pulse"></div>
+                        <div class="ring-date" id="originDate">2024.04.13</div>
+                    </div>
+                    <p class="origin-text">Our Story Begins Here</p>
+                </div>
+            </section>
+
+            <!-- 流动过渡 -->
+            <div class="flow-transition">
+                <svg viewBox="0 0 100 200" class="transition-wave">
+                    <defs>
+                        <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.1" />
+                            <stop offset="50%" style="stop-color:#FFD700;stop-opacity:0.2" />
+                            <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:0.1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M0,0 Q50,50 0,100 T0,200" fill="url(#waveGradient)"/>
+                </svg>
+            </div>
+
+
+            <!-- 小窝 -->
+            <section class="flow-section home-section">
+                <div class="section-aura"></div>
+                <div class="home-nest">
+                    <div class="nest-glow"></div>
+                    <div class="nest-photo" id="homePhoto">
+                        <input type="file" id="homeFile" accept="image/*" hidden>
+                        <div class="photo-hint">
+                            <span class="hint-icon">🏠</span>
+                            <span>Our Home</span>
+                        </div>
+                        <img id="homeImg" class="nest-img hidden">
+                        <button id="homePhotoDelete" class="home-photo-delete hidden">×</button>
+                    </div>
+                    <div class="nest-warmth">
+                        <span id="dailyQuote">家是有你的地方</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 流动过渡 -->
+            <div class="flow-transition">
+                <div class="transition-sparkle"></div>
+            </div>
+
+            <!-- 下次见面 -->
+            <section class="flow-section meeting-section">
+                <div class="section-aura"></div>
+                <div class="meeting-container">
+                    <div class="meeting-header">
+                        <span class="meeting-emoji">🌟</span>
+                        <h3 class="meeting-title">下次见面</h3>
+                        <span class="meeting-emoji">🌟</span>
+                    </div>
+                    <div class="meeting-countdown">
+                        <div class="countdown-circle">
+                            <div class="circle-glow"></div>
+                            <div class="countdown-display">
+                                <div class="count-number" id="countDays">0</div>
+                                <div class="count-unit">天</div>
+                            </div>
+                            <div class="circle-particles"></div>
+                        </div>
+                    </div>
+                    <div class="meeting-date-picker">
+                        <label class="date-label">选择期待的日子</label>
+                        <input type="date" id="nextDate" class="meeting-date-input">
+                    </div>
+                    <div class="meeting-message" id="meetingMessage">
+                        <span class="message-heart">💙</span>
+                        <span class="message-text">每一天的等待都值得</span>
+                        <span class="message-heart">💙</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 流动过渡 -->
+            <div class="flow-transition">
+                <div class="transition-gradient"></div>
+            </div>
+
+            <!-- 时光碎片 -->
+            <section class="flow-section photos-section">
+                <div class="section-aura"></div>
+                <div class="photos-river">
+                    <div class="photos-header">
+                        <div class="river-title">时光碎片</div>
+                        <button class="photo-add-btn" id="photoAdd">
+                            <input type="file" id="photoFile" accept="image/*" multiple hidden>
+                            <span class="add-btn-icon">📸</span>
+                            <span class="add-btn-text">添加美好瞬间</span>
+                        </button>
+                    </div>
+                    <div class="photos-grid" id="photoStream">
+                        <!-- 照片动态加载 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 流动过渡 -->
+            <div class="flow-transition">
+                <div class="transition-blur"></div>
+            </div>
+
+            <!-- 心情涟漪 -->
+            <section class="flow-section mood-section">
+                <div class="section-aura"></div>
+                <div class="mood-pool">
+                    <div class="mood-bubbles">
+                        <button class="mood-drop" data-mood="happy">😊</button>
+                        <button class="mood-drop" data-mood="love">💙</button>
+                        <button class="mood-drop" data-mood="miss">🌙</button>
+                        <button class="mood-drop" data-mood="sunny">☀️</button>
+                        <button class="mood-drop hug-drop" data-mood="hug">🤗</button>
+                    </div>
+                    <div class="mood-input-container">
+                        <textarea id="moodText" class="mood-input" 
+                                  placeholder="此刻想说..." maxlength="50"></textarea>
+                        <button id="moodSend" class="mood-send-btn">💙</button>
+                    </div>
+                    <div class="mood-ripples" id="moodRipples"></div>
+                </div>
+            </section>
+
+            <!-- 无尽延续 -->
+            <div class="flow-infinite">
+                <div class="infinite-fade"></div>
+                <div class="infinite-dots">
